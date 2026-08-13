@@ -1,0 +1,143 @@
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family: 'Segoe UI', sans-serif;
+}
+
+body{
+    background:#f4f6fb;
+}
+
+/* CONTENEDOR GENERAL */
+.dashboard{
+    display:flex;
+}
+
+/* SIDEBAR */
+.sidebar{
+    width:220px;
+    height:100vh;
+    background:#ff8c42;
+    color:rgb(255, 255, 255);
+    padding:20px;
+    position:fixed;
+}
+
+.sidebar .logo{
+    margin-bottom:30px;
+}
+
+.sidebar ul{
+    list-style:none;
+}
+
+.sidebar ul li{
+    margin:15px 0;
+}
+
+.sidebar ul li a{
+    color:white;
+    text-decoration:none;
+    display:block;
+    padding:10px;
+    border-radius:8px;
+    transition:0.3s;
+}
+
+.sidebar ul li a:hover,
+.sidebar ul .active a{
+    background:rgb(255, 255, 255);
+    color:#ff8c42;
+}
+
+.logout{
+    margin-top:50px;
+}
+
+/* MAIN */
+.main{
+    margin-left:220px;
+    padding:20px;
+    width:100%;
+}
+
+/* TOPBAR */
+.topbar{
+    display:flex;
+    justify-content:space-between;
+    margin-bottom:20px;
+}
+
+.topbar input{
+    padding:10px;
+    width:250px;
+    border-radius:8px;
+    border:1px solid #ccc;
+}
+
+.user{
+    background:white;
+    padding:10px 15px;
+    border-radius:8px;
+}
+
+/* CARDS */
+.cards{
+    display:grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap:15px;
+    margin-bottom:20px;
+}
+
+.card{
+    background:white;
+    padding:20px;
+    border-radius:12px;
+    box-shadow:0 2px 10px rgba(0,0,0,0.1);
+    text-align:center;
+}
+
+/* TABLA */
+.tabla{
+    background:white;
+    padding:20px;
+    border-radius:12px;
+    margin-bottom:20px;
+}
+
+table{
+    width:100%;
+    border-collapse:collapse;
+}
+
+th, td{
+    padding:10px;
+    text-align:left;
+}
+
+th{
+    background:#eee;
+}
+
+.activo{
+    color:green;
+}
+
+.pendiente{
+    color:orange;
+}
+
+/* GRAFICO */
+.grafico{
+    background:white;
+    padding:20px;
+    border-radius:12px;
+}
+
+.barra{
+    height:150px;
+    background:linear-gradient(90deg, #ff8c42, #f1ad6d);
+    border-radius:10px;
+    margin-top:10px;
+}

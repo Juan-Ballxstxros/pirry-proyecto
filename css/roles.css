@@ -1,0 +1,136 @@
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:'Segoe UI', sans-serif;
+}
+
+body{
+    background:#f4f6fb;
+}
+
+/* LAYOUT */
+.dashboard{
+    display:flex;
+}
+
+/* SIDEBAR */
+.sidebar{
+    width:220px;
+    height:100vh;
+    background:#ff8c42;
+    color:white;
+    padding:20px;
+    position:fixed;
+}
+
+.sidebar .logo{
+    margin-bottom:30px;
+}
+
+.sidebar ul{
+    list-style:none;
+}
+
+.sidebar ul li{
+    margin:15px 0;
+}
+
+.sidebar ul li a{
+    color:white;
+    text-decoration:none;
+    padding:10px;
+    display:block;
+    border-radius:8px;
+    transition:0.3s;
+}
+
+.sidebar ul li a:hover,
+.sidebar ul .active a{
+    background:white;
+    color:#ff8c42;
+}
+
+.logout{
+    margin-top:40px;
+}
+
+/* MAIN */
+.main{
+    margin-left:220px;
+    padding:20px;
+    width:100%;
+}
+
+/* TARJETAS */
+.card{
+    background:white;
+    padding:20px;
+    border-radius:12px;
+    margin-bottom:20px;
+    box-shadow:0 2px 10px rgba(0,0,0,0.1);
+}
+
+/* FORM */
+.formulario{
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
+}
+
+.formulario input{
+    padding:10px;
+    border-radius:8px;
+    border:1px solid #ccc;
+    flex:1;
+}
+
+.formulario button{
+    padding:10px 20px;
+    border:none;
+    background:#ff8c42;
+    color:white;
+    border-radius:8px;
+    cursor:pointer;
+}
+
+/* TABLA */
+table{
+    width:100%;
+    border-collapse:collapse;
+    margin-top:10px;
+}
+
+th, td{
+    padding:12px;
+    text-align:left;
+}
+
+th{
+    background:#eee;
+}
+
+tr:nth-child(even){
+    background:#f9f9f9;
+}
+
+/* ESTADOS */
+.activo{
+    color:green;
+    font-weight:bold;
+}
+
+.inactivo{
+    color:red;
+    font-weight:bold;
+}
+
+/* BOTON */
+.btn{
+    background:#ff8c42;
+    color:white;
+    padding:6px 12px;
+    border-radius:6px;
+    text-decoration:none;
+    font-size:14px;
+}

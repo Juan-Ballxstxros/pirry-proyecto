@@ -1,0 +1,164 @@
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:'Segoe UI', sans-serif;
+}
+
+body{
+    height:100vh;
+    background:  url("https://img.freepik.com/fotos-premium/imagen-muchos-articulos-diferentes-comida-rapida-como-hamburguesas-papas-fritas-taza-salsa_873925-7490.jpg");;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+}
+
+/* CONTENEDOR */
+.contenedor{
+    width:750px;
+    height:420px;
+    display:flex;
+    border-radius:20px;
+    overflow:hidden;
+    box-shadow:0 15px 35px rgba(0,0,0,0.1);
+}
+
+/* IZQUIERDA */
+.left{
+    flex:1;
+    background:linear-gradient(135deg,#ff8c42,#f5a370);
+    color:white;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:30px;
+}
+
+.texto{
+    text-align:center;
+}
+
+.texto h1{
+    font-size:34px;
+}
+
+.texto p{
+    margin-top:10px;
+    opacity:0.8;
+}
+
+/* DERECHA */
+.right{
+    flex:1;
+    background:white;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    position:relative;
+}
+
+/* BOTÓN VOLVER */
+.btn-volver{
+    position:absolute;
+    top:15px;
+    left:15px;
+    text-decoration:none;
+    font-size:18px;
+    background:#f0f0f0;
+    padding:6px 10px;
+    border-radius:8px;
+    color:#333;
+    transition:0.3s;
+}
+
+.btn-volver:hover{
+    background:#ff8c42;
+    color:white;
+}
+
+/* FORM */
+.login-box{
+    width:260px;
+    display:flex;
+    flex-direction:column;
+    gap:15px;
+}
+
+.login-box h2{
+    text-align:center;
+    margin-bottom:10px;
+}
+
+/* INPUTS */
+.input-box{
+    display:flex;
+    flex-direction:column;
+}
+
+.input-box label{
+    font-size:13px;
+    margin-bottom:5px;
+}
+
+.input-box input{
+    padding:10px;
+    border-radius:8px;
+    border:1px solid #ccc;
+    transition:0.3s;
+}
+
+.input-box input:focus{
+    border-color:#ff8c42;
+    outline:none;
+}
+
+/* CONTENEDOR */
+.botones{
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+}
+
+/* ESTILO BASE PARA AMBOS */
+.botones .btn{
+    width:100%;
+    padding:10px;
+    border-radius:8px;
+    border:none;
+    text-align:center;
+    font-size:14px;
+    cursor:pointer;
+    text-decoration:none;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+}
+
+/* INGRESAR */
+.ingresar{
+    background:#ff8c42;
+    color:white;
+}
+
+/* VOLVER */
+.volver{
+    background:#e0e0e0;
+    color:#333;
+}
+
+/* HOVER */
+.ingresar:hover{
+    background:#ff8c42;
+}
+
+.volver:hover{
+    background:#ff8c42;
+    color:white;
+}
+
+.info-login{
+    margin-top:15px;
+    font-size:14px;
+    color:#777;
+    text-align:center;
+}
