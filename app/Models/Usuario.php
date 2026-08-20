@@ -8,6 +8,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 
 class Usuario extends Authenticatable
 {
+    public $timestamps = false;
     protected $table = 'usuarios';
 
     protected $fillable = [
@@ -47,3 +48,4 @@ class Usuario extends Authenticatable
         return strtolower($this->estado) === 'activo';
     }
 }
+
