@@ -101,7 +101,6 @@ function renderProductos() {
     }
 
     lista.innerHTML = productos.map(p => {
-        const img = p.imagen || 'https://images.unsplash.com/photo-1550547660-d9450f859349?w=400';
         const disponible = p.disponible !== false;
         const adminBtns = isAdmin ? `
             <div class="admin-controls">
@@ -111,11 +110,10 @@ function renderProductos() {
 
         return `
         <div class="card ${disponible ? '' : 'product-out'}">
-            <img src="${img}" alt="${p.nombre}" loading="lazy">
             <span class="cat-badge">${p.categoria || ''}</span>
             <h3>${p.nombre}</h3>
             <p class="desc">${p.descripcion || ''}</p>
-            <div class="price">$${formatPrecio(p.precio)}</div>
+            <div class="price">$0</div>
             <button class="btn-add" onclick="agregarAlCarrito(${p.id})" ${disponible ? '' : 'disabled'}>
                 ${disponible ? '🛒 Agregar al carrito' : 'No disponible'}
             </button>
