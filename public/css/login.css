@@ -6,17 +6,20 @@
 }
 
 body{
-    height:100vh;
-    background:  url("https://img.freepik.com/fotos-premium/imagen-muchos-articulos-diferentes-comida-rapida-como-hamburguesas-papas-fritas-taza-salsa_873925-7490.jpg");;
+    min-height:100vh;
+    background:url("https://img.freepik.com/fotos-premium/imagen-muchos-articulos-diferentes-comida-rapida-como-hamburguesas-papas-fritas-taza-salsa_873925-7490.jpg") no-repeat center center fixed;
+    background-size:cover;
     display:flex;
     justify-content:center;
     align-items:center;
+    padding:24px 16px;
 }
 
 /* CONTENEDOR */
 .contenedor{
     width:750px;
-    height:420px;
+    min-height:420px;
+    height:auto;
     display:flex;
     border-radius:20px;
     overflow:hidden;
@@ -191,8 +194,7 @@ body{
 
 .register-box {
     width: 280px;
-    max-height: 90vh;
-    overflow-y: auto;
+    gap: 10px;
 }
 
 @media (max-width: 768px) {
@@ -205,9 +207,16 @@ body{
         padding: 20px;
     }
     .right {
-        padding: 20px;
+        padding: 20px 20px 26px;
     }
     .login-box, .register-box {
         width: 100%;
+    }
+}
+
+/* Pantallas poco altas: el formulario empieza arriba y se puede hacer scroll */
+@media (max-height: 720px) {
+    body {
+        align-items: flex-start;
     }
 }
