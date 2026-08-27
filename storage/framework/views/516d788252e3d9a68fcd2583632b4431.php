@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title><?php echo $__env->yieldContent('title', 'Admin - El Pirry'); ?></title>
 <link rel="stylesheet" href="<?php echo e(asset('css/interfaz_ad.css')); ?>">
+<link rel="stylesheet" href="<?php echo e(asset('css/toast.css')); ?>">
 <?php echo $__env->yieldPushContent('styles'); ?>
 </head>
 <body>
@@ -29,7 +30,7 @@
                 <a href="<?php echo e(route('home')); ?>">Ver Tienda</a>
             </li>
             <li class="logout">
-                <form action="<?php echo e(route('logout')); ?>" method="POST" onsubmit="return confirm('¿Seguro que deseas cerrar sesión?')">
+                <form action="<?php echo e(route('logout')); ?>" method="POST" onsubmit="return confirmLogout(this)">
                     <?php echo csrf_field(); ?>
                     <button type="submit" class="sidebar-logout">Cerrar sesión</button>
                 </form>
@@ -38,12 +39,21 @@
     </aside>
 
     <main class="main">
-        <?php if(session('success')): ?>
-            <div class="alert-success"><?php echo e(session('success')); ?></div>
-        <?php endif; ?>
         <?php echo $__env->yieldContent('content'); ?>
     </main>
 </div>
+
+<script>
+// Mensajes flash de Laravel -> toasts bonitos
+window.flashMessages = window.flashMessages || [];
+<?php if(session('success')): ?>
+  window.flashMessages.push({ type: 'success', message: <?php echo json_encode(session('success'), 15, 512) ?> });
+<?php endif; ?>
+<?php if(session('error')): ?>
+  window.flashMessages.push({ type: 'error', message: <?php echo json_encode(session('error'), 15, 512) ?> });
+<?php endif; ?>
+</script>
+<script src="<?php echo e(asset('js/toast.js')); ?>"></script>
 
 </body>
 </html>

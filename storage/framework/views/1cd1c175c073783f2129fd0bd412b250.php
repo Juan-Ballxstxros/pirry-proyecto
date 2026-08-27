@@ -6,6 +6,7 @@
 <meta name="csrf-token" content="<?php echo e(csrf_token()); ?>">
 <title><?php echo $__env->yieldContent('title', 'El Pirry - Comidas Rápidas'); ?></title>
 <link rel="stylesheet" href="<?php echo e(asset('css/index.css')); ?>">
+<link rel="stylesheet" href="<?php echo e(asset('css/toast.css')); ?>">
 <?php echo $__env->yieldPushContent('styles'); ?>
 </head>
 <body>
@@ -26,7 +27,7 @@
         <?php if(Auth::user()->isAdmin()): ?>
           <a href="<?php echo e(route('admin.dashboard')); ?>" class="btn-primary">Panel Admin</a>
         <?php endif; ?>
-        <form action="<?php echo e(route('logout')); ?>" method="POST" style="display:inline">
+        <form action="<?php echo e(route('logout')); ?>" method="POST" style="display:inline" onsubmit="return confirmLogout(this)">
           <?php echo csrf_field(); ?>
           <button type="submit" class="btn-primary">Cerrar sesión</button>
         </form>
@@ -36,13 +37,6 @@
     </li>
   </ul>
 </nav>
-
-<?php if(session('success')): ?>
-  <div class="alert alert-success"><?php echo e(session('success')); ?></div>
-<?php endif; ?>
-<?php if(session('error')): ?>
-  <div class="alert alert-error"><?php echo e(session('error')); ?></div>
-<?php endif; ?>
 
 <?php echo $__env->yieldContent('content'); ?>
 
@@ -96,7 +90,17 @@ const routes = {
   carritoConfirm: '<?php echo e(route('carrito.confirm')); ?>',
   login: '<?php echo e(route('login')); ?>',
 };
+
+// Mensajes flash de Laravel -> toasts bonitos
+window.flashMessages = window.flashMessages || [];
+<?php if(session('success')): ?>
+  window.flashMessages.push({ type: 'success', message: <?php echo json_encode(session('success'), 15, 512) ?> });
+<?php endif; ?>
+<?php if(session('error')): ?>
+  window.flashMessages.push({ type: 'error', message: <?php echo json_encode(session('error'), 15, 512) ?> });
+<?php endif; ?>
 </script>
+<script src="<?php echo e(asset('js/toast.js')); ?>"></script>
 <script src="<?php echo e(asset('js/index.js')); ?>"></script>
 <?php echo $__env->yieldPushContent('scripts'); ?>
 </body>

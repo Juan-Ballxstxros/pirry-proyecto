@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Iniciar Sesión - El Pirry</title>
 <link rel="stylesheet" href="{{ asset('css/login.css') }}">
+<link rel="stylesheet" href="{{ asset('css/toast.css') }}">
 </head>
 <body>
 
@@ -50,6 +51,17 @@
         </form>
     </div>
 </div>
+
+<script>
+window.flashMessages = window.flashMessages || [];
+@if(session('success'))
+  window.flashMessages.push({ type: 'success', message: @json(session('success')) });
+@endif
+@if(session('error'))
+  window.flashMessages.push({ type: 'error', message: @json(session('error')) });
+@endif
+</script>
+<script src="{{ asset('js/toast.js') }}"></script>
 
 </body>
 </html>

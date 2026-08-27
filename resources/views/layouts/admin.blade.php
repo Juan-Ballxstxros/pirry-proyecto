@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>@yield('title', 'Admin - El Pirry')</title>
 <link rel="stylesheet" href="{{ asset('css/interfaz_ad.css') }}">
+<link rel="stylesheet" href="{{ asset('css/toast.css') }}">
 @stack('styles')
 </head>
 <body>
@@ -29,7 +30,7 @@
                 <a href="{{ route('home') }}">Ver Tienda</a>
             </li>
             <li class="logout">
-                <form action="{{ route('logout') }}" method="POST" onsubmit="return confirm('¿Seguro que deseas cerrar sesión?')">
+                <form action="{{ route('logout') }}" method="POST" onsubmit="return confirmLogout(this)">
                     @csrf
                     <button type="submit" class="sidebar-logout">Cerrar sesión</button>
                 </form>
@@ -38,12 +39,21 @@
     </aside>
 
     <main class="main">
-        @if(session('success'))
-            <div class="alert-success">{{ session('success') }}</div>
-        @endif
         @yield('content')
     </main>
 </div>
+
+<script>
+// Mensajes flash de Laravel -> toasts bonitos
+window.flashMessages = window.flashMessages || [];
+@if(session('success'))
+  window.flashMessages.push({ type: 'success', message: @json(session('success')) });
+@endif
+@if(session('error'))
+  window.flashMessages.push({ type: 'error', message: @json(session('error')) });
+@endif
+</script>
+<script src="{{ asset('js/toast.js') }}"></script>
 
 </body>
 </html>

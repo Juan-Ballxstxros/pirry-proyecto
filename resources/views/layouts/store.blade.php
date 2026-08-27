@@ -6,6 +6,7 @@
 <meta name="csrf-token" content="{{ csrf_token() }}">
 <title>@yield('title', 'El Pirry - Comidas Rápidas')</title>
 <link rel="stylesheet" href="{{ asset('css/index.css') }}">
+<link rel="stylesheet" href="{{ asset('css/toast.css') }}">
 @stack('styles')
 </head>
 <body>
@@ -26,7 +27,7 @@
         @if(Auth::user()->isAdmin())
           <a href="{{ route('admin.dashboard') }}" class="btn-primary">Panel Admin</a>
         @endif
-        <form action="{{ route('logout') }}" method="POST" style="display:inline">
+        <form action="{{ route('logout') }}" method="POST" style="display:inline" onsubmit="return confirmLogout(this)">
           @csrf
           <button type="submit" class="btn-primary">Cerrar sesión</button>
         </form>
@@ -36,13 +37,6 @@
     </li>
   </ul>
 </nav>
-
-@if(session('success'))
-  <div class="alert alert-success">{{ session('success') }}</div>
-@endif
-@if(session('error'))
-  <div class="alert alert-error">{{ session('error') }}</div>
-@endif
 
 @yield('content')
 
@@ -96,7 +90,17 @@ const routes = {
   carritoConfirm: '{{ route('carrito.confirm') }}',
   login: '{{ route('login') }}',
 };
+
+// Mensajes flash de Laravel -> toasts bonitos
+window.flashMessages = window.flashMessages || [];
+@if(session('success'))
+  window.flashMessages.push({ type: 'success', message: @json(session('success')) });
+@endif
+@if(session('error'))
+  window.flashMessages.push({ type: 'error', message: @json(session('error')) });
+@endif
 </script>
+<script src="{{ asset('js/toast.js') }}"></script>
 <script src="{{ asset('js/index.js') }}"></script>
 @stack('scripts')
 </body>

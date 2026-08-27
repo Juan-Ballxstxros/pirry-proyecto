@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Role;
 use App\Models\Usuario;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -75,22 +76,52 @@ class AuthController extends Controller
             'contrasena.confirmed' => 'Las contraseñas no coinciden.',
         ]);
 
-        $clienteRol = \App\Models\Role::where('nombre', 'Cliente')->first();
-        $rolId = $clienteRol ? $clienteRol->id_roles : 2;
+        try {
+            $rolId = $this->resolverRolCliente();
 
-        $usuario = Usuario::create([
-            'nombre' => $request->nombre,
-            'documento' => $request->documento,
-            'correo' => $request->correo,
-            'usuario' => $request->usuario,
-            'contrasena' => Hash::make($request->contrasena),
-            'id_rol' => $rolId,
-            'estado' => 'activo',
-        ]);
+            $usuario = Usuario::create([
+                'nombre' => $request->nombre,
+                'documento' => $request->documento,
+                'correo' => $request->correo,
+                'usuario' => $request->usuario,
+                'contrasena' => Hash::make($request->contrasena),
+                'id_rol' => $rolId,
+                'estado' => 'activo',
+            ]);
+        } catch (\Throwable $e) {
+            report($e);
+
+            return back()
+                ->withInput()
+                ->withErrors(['correo' => 'No pudimos crear tu cuenta en este momento. Por favor intenta de nuevo.']);
+        }
 
         Auth::login($usuario);
 
-        return redirect()->route('home')->with('success', '¡Cuenta creada exitosamente!');
+        return redirect()->route('home')
+            ->with('success', '¡Tu cuenta fue creada con éxito! Bienvenido a El Pirry 🎉');
+    }
+
+    /**
+     * Devuelve el id de un rol válido para el nuevo cliente.
+     * Orden de búsqueda: rol "Cliente" -> cualquier rol existente.
+     * Si la tabla de roles está vacía, crea el rol "Cliente" para que
+     * el registro nunca falle por la llave foránea id_rol.
+     */
+    private function resolverRolCliente(): int
+    {
+        $rol = Role::where('nombre', 'Cliente')->first()
+            ?? Role::orderBy('id_roles')->first();
+
+        if ($rol) {
+            return (int) $rol->id_roles;
+        }
+
+        return (int) Role::create([
+            'nombre' => 'Cliente',
+            'descripcion' => 'cliente de la tienda',
+            'estado' => 'Activo',
+        ])->id_roles;
     }
 
     public function logout(Request $request)
@@ -99,6 +130,7 @@ class AuthController extends Controller
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
-        return redirect()->route('login');
+        return redirect()->route('login')
+            ->with('success', 'Sesión cerrada correctamente. ¡Vuelve pronto! 👋');
     }
 }

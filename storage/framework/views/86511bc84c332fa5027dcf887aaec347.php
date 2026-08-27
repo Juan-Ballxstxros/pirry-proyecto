@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Crear Cuenta - El Pirry</title>
 <link rel="stylesheet" href="<?php echo e(asset('css/login.css')); ?>">
+<link rel="stylesheet" href="<?php echo e(asset('css/toast.css')); ?>">
 </head>
 <body>
 
@@ -67,6 +68,17 @@
         </form>
     </div>
 </div>
+
+<script>
+window.flashMessages = window.flashMessages || [];
+<?php if(session('success')): ?>
+  window.flashMessages.push({ type: 'success', message: <?php echo json_encode(session('success'), 15, 512) ?> });
+<?php endif; ?>
+<?php if(session('error')): ?>
+  window.flashMessages.push({ type: 'error', message: <?php echo json_encode(session('error'), 15, 512) ?> });
+<?php endif; ?>
+</script>
+<script src="<?php echo e(asset('js/toast.js')); ?>"></script>
 
 </body>
 </html>
