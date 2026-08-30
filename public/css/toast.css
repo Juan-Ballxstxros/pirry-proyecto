@@ -141,11 +141,15 @@
   z-index: 10001;
   padding: 20px;
   opacity: 0;
-  transition: opacity 0.25s ease;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity 0.25s ease, visibility 0.25s ease;
 }
 
 .pirry-confirm-overlay.show {
   opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
 }
 
 .pirry-confirm {
@@ -228,4 +232,14 @@
 
 .pirry-confirm__btn--ok:hover {
   background: #f07b2d;
+}
+
+/* Variante destructiva (acciones como Eliminar) */
+.pirry-confirm__btn--danger {
+  background: #ef4444;
+  color: #ffffff;
+}
+
+.pirry-confirm__btn--danger:hover {
+  background: #dc2626;
 }

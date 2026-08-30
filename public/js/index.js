@@ -340,7 +340,7 @@ async function guardarProducto() {
     };
 
     if (!body.nombre || isNaN(body.precio) || body.precio < 0 || !body.id_categoria) {
-        alert('Complete los campos obligatorios');
+        showToast('Complete los campos obligatorios.', 'error');
         return;
     }
 
@@ -362,17 +362,28 @@ async function guardarProducto() {
             cerrarModal();
             await cargarProductos();
             if (window.refrescarMenuTrasAdmin) window.refrescarMenuTrasAdmin();
-            alert(data.exito);
+            // Notificación integrada en la página (sin alert() nativo):
+            // título = "¡Producto actualizado!" / "¡Producto creado!" según la acción.
+            showToast('Los cambios se guardaron correctamente.', 'success', 4200, '¡' + data.exito + '!');
         } else {
-            alert(data.error || 'Error al guardar');
+            showToast(data.error || 'Error al guardar el producto.', 'error');
         }
     } catch (err) {
-        alert('Error de conexión');
+        showToast('Error de conexión al guardar el producto.', 'error');
     }
 }
 
 async function eliminarProducto(id) {
-    if (!confirm('¿Desactivar este producto?')) return;
+    // Confirmación con el modal del proyecto (sin confirm() nativo)
+    const confirmado = await pirryConfirm({
+        icon: '🗑️',
+        title: '¿Estás seguro?',
+        text: '¿Quieres eliminar este producto? Esta acción no se puede deshacer.',
+        okText: 'Eliminar',
+        cancelText: 'Cancelar',
+        danger: true,
+    });
+    if (!confirmado) return;
 
     try {
         const res = await fetch(`${routes.productos}/${id}`, {
@@ -386,11 +397,12 @@ async function eliminarProducto(id) {
         if (data.exito) {
             await cargarProductos();
             if (window.refrescarMenuTrasAdmin) window.refrescarMenuTrasAdmin();
-            alert(data.exito);
+            // Notificación integrada en la página (sin alert() nativo)
+            showToast('El producto se eliminó correctamente.', 'success', 4200, '¡Producto eliminado!');
         } else {
-            alert(data.error || 'Error al eliminar');
+            showToast(data.error || 'Error al eliminar el producto.', 'error');
         }
     } catch (err) {
-        alert('Error de conexión');
+        showToast('Error de conexión al eliminar el producto.', 'error');
     }
 }
