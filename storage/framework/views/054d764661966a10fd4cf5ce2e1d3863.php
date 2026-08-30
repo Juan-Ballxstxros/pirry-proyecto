@@ -15,22 +15,31 @@
 </section>
 
 <section id="Productos" class="section">
-  <h2>Nuestro Menú</h2>
-  <p>Descubre nuestras especialidades</p>
+  <h2 class="menu-titulo">Menú</h2>
+  <p class="menu-subtitulo">Elige una categoría y agrega lo que más te guste</p>
 
-  <div class="products-filters">
-    <input type="text" id="busqueda" placeholder="🔍 Buscar producto por nombre...">
-    <select id="filtroCategoria">
-      <option value="">Todas las categorías</option>
-    </select>
-    <?php if($esAdmin): ?>
+  
+  <div class="menu-busqueda">
+    <input type="text" id="busquedaMenu" placeholder="🔍 Buscar producto por nombre...">
+  </div>
+
+  
+  <div class="menu-filtros" id="menuFiltros">
+    <p class="loading-msg">Cargando categorías...</p>
+  </div>
+
+  <div class="menu-grid" id="menuGrid">
+    <p class="loading-msg">Cargando productos...</p>
+  </div>
+
+  <?php if($esAdmin): ?>
+    
+    <div class="menu-admin-bar">
       <button class="btn-edit" onclick="abrirModalCrear()">➕ Nuevo Producto</button>
-    <?php endif; ?>
-  </div>
+    </div>
+  <?php endif; ?>
 
-  <div class="products" id="listaProductos">
-    <p class="loading-msg">Cargando menú...</p>
-  </div>
+  
 </section>
 
 <div id="modalProducto" class="modal">
@@ -44,8 +53,8 @@
     <label>Descripción</label>
     <textarea id="prodDescripcion"></textarea>
 
-    <label>Precio * ($)</label>
-    <input type="number" id="prodPrecio" step="0.01" min="0" required>
+    <label>Precio ($) — opcional, no se muestra al cliente</label>
+    <input type="number" id="prodPrecio" step="0.01" min="0">
 
     <label>Categoría *</label>
     <select id="prodCategoria" required></select>
@@ -72,9 +81,6 @@
     <div id="contenidoCarrito">
       <p>Tu carrito está vacío.</p>
     </div>
-    <div class="carrito-total">
-      <strong>Total: $<span id="totalCarrito">0.00</span></strong>
-    </div>
     <div class="modal-buttons">
       <button class="btn-cancel" onclick="cerrarCarrito()">Seguir comprando</button>
       <button class="btn-save" onclick="confirmarPedido()">✅ Confirmar Pedido</button>
@@ -93,5 +99,14 @@
 </section>
 
 <?php $__env->stopSection(); ?>
+
+
+<?php $__env->startPush('styles'); ?>
+<link rel="stylesheet" href="<?php echo e(asset('css/menu.css')); ?>">
+<?php $__env->stopPush(); ?>
+
+<?php $__env->startPush('scripts'); ?>
+<script src="<?php echo e(asset('js/menu.js')); ?>"></script>
+<?php $__env->stopPush(); ?>
 
 <?php echo $__env->make('layouts.store', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\Users\JUAN DAVID\Downloads\pirry-proyecto-master\pirry-proyecto-master\resources\views/store/index.blade.php ENDPATH**/ ?>

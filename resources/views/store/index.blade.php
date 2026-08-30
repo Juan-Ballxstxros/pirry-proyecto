@@ -17,9 +17,42 @@
 </section>
 
 <section id="Productos" class="section">
-  <h2>Nuestro Menú</h2>
-  <p>Descubre nuestras especialidades</p>
+  <h2 class="menu-titulo">Menú</h2>
+  <p class="menu-subtitulo">Elige una categoría y agrega lo que más te guste</p>
 
+  {{-- Búsqueda dentro del menú --}}
+  <div class="menu-busqueda">
+    <input type="text" id="busquedaMenu" placeholder="🔍 Buscar producto por nombre...">
+  </div>
+
+  {{-- ============================================================
+       MENÚ: filtros por categoría + cuadrícula de productos,
+       conectado a la base de datos (API /productos). Diseñado a
+       propósito SIN imágenes y SIN precios: las tarjetas muestran
+       nombre, descripción y botón "Agregar al carrito".
+       ============================================================ --}}
+  <div class="menu-filtros" id="menuFiltros">
+    <p class="loading-msg">Cargando categorías...</p>
+  </div>
+
+  <div class="menu-grid" id="menuGrid">
+    <p class="loading-msg">Cargando productos...</p>
+  </div>
+
+  @if($esAdmin)
+    {{-- Se mantiene el acceso al CRUD de productos para administradores --}}
+    <div class="menu-admin-bar">
+      <button class="btn-edit" onclick="abrirModalCrear()">➕ Nuevo Producto</button>
+    </div>
+  @endif
+
+  {{-- ============================================================
+       MENÚ ANTERIOR (conectado a la base de datos) — TEMPORALMENTE
+       OCULTO porque el menú por categorías de arriba ya está conectado
+       a la base de datos. Este bloque (lista plana + búsqueda en
+       servidor) se conserva por si se quiere volver a mostrar.
+       NO ELIMINAR.
+       ============================================================
   <div class="products-filters">
     <input type="text" id="busqueda" placeholder="🔍 Buscar producto por nombre...">
     <select id="filtroCategoria">
@@ -33,6 +66,7 @@
   <div class="products" id="listaProductos">
     <p class="loading-msg">Cargando menú...</p>
   </div>
+  ============================================================ --}}
 </section>
 
 <div id="modalProducto" class="modal">
@@ -46,8 +80,8 @@
     <label>Descripción</label>
     <textarea id="prodDescripcion"></textarea>
 
-    <label>Precio * ($)</label>
-    <input type="number" id="prodPrecio" step="0.01" min="0" required>
+    <label>Precio ($) — opcional, no se muestra al cliente</label>
+    <input type="number" id="prodPrecio" step="0.01" min="0">
 
     <label>Categoría *</label>
     <select id="prodCategoria" required></select>
@@ -74,9 +108,6 @@
     <div id="contenidoCarrito">
       <p>Tu carrito está vacío.</p>
     </div>
-    <div class="carrito-total">
-      <strong>Total: $<span id="totalCarrito">0.00</span></strong>
-    </div>
     <div class="modal-buttons">
       <button class="btn-cancel" onclick="cerrarCarrito()">Seguir comprando</button>
       <button class="btn-save" onclick="confirmarPedido()">✅ Confirmar Pedido</button>
@@ -95,3 +126,12 @@
 </section>
 
 @endsection
+
+{{-- Estilos y script del nuevo menú por categorías --}}
+@push('styles')
+<link rel="stylesheet" href="{{ asset('css/menu.css') }}">
+@endpush
+
+@push('scripts')
+<script src="{{ asset('js/menu.js') }}"></script>
+@endpush

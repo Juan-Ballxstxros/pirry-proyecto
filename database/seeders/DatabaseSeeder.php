@@ -83,27 +83,37 @@ class DatabaseSeeder extends Seeder
         ]);
     }
 
-    private function seedCategoriesAndProducts(): void
+    /**
+     * Categorías oficiales del menú (las 8 del restaurante) + Acompañamientos.
+     * firstOrCreate es idempotente: se puede ejecutar `php artisan db:seed`
+     * en una base de datos existente sin duplicar categorías ni tocar productos.
+     */
+    private function seedCategories(): void
     {
-        if (Product::count() > 0) {
-            return;
-        }
-
         $categorias = [
-            ['nombre' => 'Salchipapas'],
-            ['nombre' => 'Hamburguesas'],
-            ['nombre' => 'Bebidas'],
-            ['nombre' => 'Acompañamientos'],
+            'Salchipapas', 'Tociqueso', 'Picadas', 'Hamburguesas',
+            'Perros', 'Perras', 'Bebidas', 'Pirrypollo', 'Adiciones',
+            'Acompañamientos',
         ];
 
-        foreach ($categorias as $cat) {
-            Category::firstOrCreate(['nombre' => $cat['nombre']]);
+        foreach ($categorias as $nombre) {
+            Category::firstOrCreate(['nombre' => $nombre]);
+        }
+    }
+
+    private function seedCategoriesAndProducts(): void
+    {
+        $this->seedCategories();
+
+        if (Product::count() > 0) {
+            return;
         }
 
         $salchipapas = Category::where('nombre', 'Salchipapas')->first()->id;
         $hamburguesas = Category::where('nombre', 'Hamburguesas')->first()->id;
         $bebidas = Category::where('nombre', 'Bebidas')->first()->id;
         $acompanamientos = Category::where('nombre', 'Acompañamientos')->first()->id;
+        $adiciones = Category::where('nombre', 'Adiciones')->first()->id;
 
         $imgSalchi = 'https://images.unsplash.com/photo-1585238342024-78d3877844da?w=400';
         $imgHamb = 'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=400';
@@ -121,6 +131,12 @@ class DatabaseSeeder extends Seeder
             ['nombre' => 'Gaseosa Personal', 'descripcion' => 'Coca-Cola, Sprite o Colombiana 400ml', 'precio' => 3000, 'imagen' => $imgBebida, 'id_categoria' => $bebidas],
             ['nombre' => 'Jugo Natural', 'descripcion' => 'Jugo de fruta natural del día', 'precio' => 5000, 'imagen' => $imgBebida, 'id_categoria' => $bebidas],
             ['nombre' => 'Papas Fritas', 'descripcion' => 'Porción de papas crujientes', 'precio' => 6000, 'imagen' => $imgPapas, 'id_categoria' => $acompanamientos],
+            // Adiciones (precio 0 = sin precio; nunca se muestra al cliente)
+            ['nombre' => 'Tocineta', 'descripcion' => 'Adición de tocineta crujiente para tus platos', 'precio' => 0, 'imagen' => null, 'id_categoria' => $adiciones],
+            ['nombre' => 'Queso', 'descripcion' => 'Adición de queso para tus platos', 'precio' => 0, 'imagen' => null, 'id_categoria' => $adiciones],
+            ['nombre' => 'Chorizo', 'descripcion' => 'Adición de chorizo para tus platos', 'precio' => 0, 'imagen' => null, 'id_categoria' => $adiciones],
+            ['nombre' => 'Huevos', 'descripcion' => 'Adición de huevos para tus platos', 'precio' => 0, 'imagen' => null, 'id_categoria' => $adiciones],
+            ['nombre' => 'Butifarras', 'descripcion' => 'Adición de butifarra para tus platos', 'precio' => 0, 'imagen' => null, 'id_categoria' => $adiciones],
         ];
 
         foreach ($productos as $p) {

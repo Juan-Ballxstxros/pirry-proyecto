@@ -3,7 +3,10 @@ let categorias = [];
 let categoriasMap = {};
 
 document.addEventListener('DOMContentLoaded', () => {
-    cargarProductos();
+    // El menú por categorías (menu.js) maneja la carga inicial cuando existe
+    if (!document.getElementById('menuCategorias')) {
+        cargarProductos();
+    }
     actualizarBadgeCarrito();
 
     const busqueda = document.getElementById('busqueda');
@@ -41,7 +44,9 @@ function debounce(fn, delay) {
 
 async function cargarProductos() {
     const lista = document.getElementById('listaProductos');
-    if (!lista) return;
+    const selectModal = document.getElementById('prodCategoria');
+    // Si no hay lista de productos ni modal de admin, no hay nada que cargar.
+    if (!lista && !selectModal) return;
 
     const busqueda = document.getElementById('busqueda')?.value || '';
     const categoria = document.getElementById('filtroCategoria')?.value || '';
@@ -56,8 +61,10 @@ async function cargarProductos() {
         extraerCategorias();
         renderProductos();
         llenarFiltroCategorias();
+        return true;
     } catch (err) {
-        lista.innerHTML = '<p class="loading-msg">Error al cargar el menú. Intenta de nuevo.</p>';
+        if (lista) lista.innerHTML = '<p class="loading-msg">Error al cargar el menú. Intenta de nuevo.</p>';
+        return false;
     }
 }
 
@@ -113,7 +120,6 @@ function renderProductos() {
             <span class="cat-badge">${p.categoria || ''}</span>
             <h3>${p.nombre}</h3>
             <p class="desc">${p.descripcion || ''}</p>
-            <div class="price">$0</div>
             <button class="btn-add" onclick="agregarAlCarrito(${p.id})" ${disponible ? '' : 'disabled'}>
                 ${disponible ? '🛒 Agregar al carrito' : 'No disponible'}
             </button>
@@ -180,19 +186,17 @@ async function verCarrito() {
 
 function renderCarrito(data) {
     const contenido = document.getElementById('contenidoCarrito');
-    const totalEl = document.getElementById('totalCarrito');
 
     if (!data.items || data.items.length === 0) {
         contenido.innerHTML = '<p>Tu carrito está vacío.</p>';
-        totalEl.textContent = '0.00';
         return;
     }
 
-    let html = '<table><thead><tr><th>Producto</th><th>Precio</th><th>Cant.</th><th>Subtotal</th><th></th></tr></thead><tbody>';
+    // Carrito SIN precios ni totales monetarios: solo producto, cantidad y eliminar
+    let html = '<table><thead><tr><th>Producto</th><th>Cant.</th><th></th></tr></thead><tbody>';
     data.items.forEach(item => {
         html += `<tr>
             <td>${item.nombre}</td>
-            <td>$${formatPrecio(item.precio)}</td>
             <td>
                 <div class="qty-controls">
                     <button onclick="cambiarCantidad(${item.id}, ${item.cantidad - 1})">−</button>
@@ -200,13 +204,11 @@ function renderCarrito(data) {
                     <button onclick="cambiarCantidad(${item.id}, ${item.cantidad + 1})">+</button>
                 </div>
             </td>
-            <td>$${formatPrecio(item.subtotal)}</td>
             <td><button class="btn-del-small" onclick="eliminarDelCarrito(${item.id})">🗑️</button></td>
         </tr>`;
     });
     html += '</tbody></table>';
     contenido.innerHTML = html;
-    totalEl.textContent = formatPrecio(data.total);
 }
 
 function cerrarCarrito() {
@@ -275,7 +277,7 @@ async function confirmarPedido() {
         }
 
         if (data.exito) {
-            alert(`¡Pedido #${data.pedido_id} confirmado! Total: $${formatPrecio(data.total)}`);
+            alert(`¡Pedido #${data.pedido_id} confirmado! 🎉`);
             cerrarCarrito();
             actualizarBadge(0);
         } else {
@@ -327,15 +329,17 @@ function cerrarModal() {
 
 async function guardarProducto() {
     const id = document.getElementById('prodId').value;
+    const precioRaw = document.getElementById('prodPrecio').value;
+
     const body = {
         nombre: document.getElementById('prodNombre').value,
         descripcion: document.getElementById('prodDescripcion').value,
-        precio: parseFloat(document.getElementById('prodPrecio').value),
+        precio: precioRaw === '' ? 0 : parseFloat(precioRaw),
         id_categoria: parseInt(document.getElementById('prodCategoria').value),
         disponible: document.getElementById('prodDisponible').checked,
     };
 
-    if (!body.nombre || !body.precio || !body.id_categoria) {
+    if (!body.nombre || isNaN(body.precio) || body.precio < 0 || !body.id_categoria) {
         alert('Complete los campos obligatorios');
         return;
     }
@@ -356,7 +360,8 @@ async function guardarProducto() {
         const data = await res.json();
         if (data.exito) {
             cerrarModal();
-            cargarProductos();
+            await cargarProductos();
+            if (window.refrescarMenuTrasAdmin) window.refrescarMenuTrasAdmin();
             alert(data.exito);
         } else {
             alert(data.error || 'Error al guardar');
@@ -379,7 +384,8 @@ async function eliminarProducto(id) {
         });
         const data = await res.json();
         if (data.exito) {
-            cargarProductos();
+            await cargarProductos();
+            if (window.refrescarMenuTrasAdmin) window.refrescarMenuTrasAdmin();
             alert(data.exito);
         } else {
             alert(data.error || 'Error al eliminar');

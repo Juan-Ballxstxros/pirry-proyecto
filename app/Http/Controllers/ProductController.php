@@ -54,7 +54,7 @@ class ProductController extends Controller
         $validated = $request->validate([
             'nombre' => 'required|string|max:150',
             'descripcion' => 'nullable|string',
-            'precio' => 'required|numeric|min:0.01',
+            'precio' => 'nullable|numeric|min:0',
             'id_categoria' => 'required|integer|exists:categorias,id',
             'disponible' => 'boolean',
         ]);
@@ -62,7 +62,7 @@ class ProductController extends Controller
         $producto = Product::create([
             'nombre' => $validated['nombre'],
             'descripcion' => $validated['descripcion'] ?? '',
-            'precio' => $validated['precio'],
+            'precio' => $validated['precio'] ?? 0,
             'id_categoria' => $validated['id_categoria'],
             'disponible' => $validated['disponible'] ?? true,
             'estado' => 'activo',
@@ -80,7 +80,7 @@ class ProductController extends Controller
         $validated = $request->validate([
             'nombre' => 'required|string|max:150',
             'descripcion' => 'nullable|string',
-            'precio' => 'required|numeric|min:0.01',
+            'precio' => 'nullable|numeric|min:0',
             'id_categoria' => 'required|integer|exists:categorias,id',
             'disponible' => 'boolean',
         ]);
@@ -88,7 +88,7 @@ class ProductController extends Controller
         $producto->update([
             'nombre' => $validated['nombre'],
             'descripcion' => $validated['descripcion'] ?? '',
-            'precio' => $validated['precio'],
+            'precio' => $validated['precio'] ?? 0,
             'id_categoria' => $validated['id_categoria'],
             'disponible' => $request->boolean('disponible'),
         ]);
