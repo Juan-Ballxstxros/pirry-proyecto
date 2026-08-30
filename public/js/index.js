@@ -4,7 +4,7 @@ let categoriasMap = {};
 
 document.addEventListener('DOMContentLoaded', () => {
     // El menú por categorías (menu.js) maneja la carga inicial cuando existe
-    if (!document.getElementById('menuCategorias')) {
+    if (!document.getElementById('menuFiltros')) {
         cargarProductos();
     }
     actualizarBadgeCarrito();
@@ -305,6 +305,7 @@ function abrirModalCrear() {
     document.getElementById('prodDescripcion').value = '';
     document.getElementById('prodPrecio').value = '';
     document.getElementById('prodDisponible').checked = true;
+    resetearImagenModal(null);
     document.getElementById('modalProducto').style.display = 'flex';
 }
 
@@ -320,6 +321,7 @@ function abrirModalEditar(id) {
     document.getElementById('prodPrecio').value = p.precio;
     document.getElementById('prodCategoria').value = p.id_categoria;
     document.getElementById('prodDisponible').checked = p.disponible !== false;
+    resetearImagenModal(p.imagen || null);
     document.getElementById('modalProducto').style.display = 'flex';
 }
 
@@ -327,21 +329,130 @@ function cerrarModal() {
     document.getElementById('modalProducto').style.display = 'none';
 }
 
+/* ---------- Imagen del producto (solo administrador) ---------- */
+
+/* Ajusta la vista previa del modal según el estado actual de la imagen */
+function resetearImagenModal(imagenActual) {
+    const input = document.getElementById('prodImagen');
+    const previewImg = document.getElementById('imagenPreviewImg');
+    const vaciaTxt = document.getElementById('imagenVaciaTxt');
+    const btnEliminar = document.getElementById('btnEliminarImagen');
+    if (!input) return;
+
+    input.value = '';
+    if (previewImg.src && previewImg.src.startsWith('blob:')) {
+        URL.revokeObjectURL(previewImg.src);
+    }
+
+    if (imagenActual) {
+        previewImg.src = imagenActual;
+        previewImg.style.display = 'block';
+        vaciaTxt.style.display = 'none';
+        btnEliminar.style.display = 'inline-block';
+    } else {
+        previewImg.src = '';
+        previewImg.style.display = 'none';
+        vaciaTxt.style.display = 'block';
+        btnEliminar.style.display = 'none';
+    }
+}
+
+/* Vista previa instantánea al elegir archivo (validación rápida en cliente;
+   la validación definitiva la hace Laravel en el servidor) */
+document.addEventListener('DOMContentLoaded', () => {
+    const inputImagen = document.getElementById('prodImagen');
+    if (!inputImagen) return;
+
+    inputImagen.addEventListener('change', () => {
+        const archivo = inputImagen.files && inputImagen.files[0];
+        if (!archivo) return;
+
+        const tiposPermitidos = ['image/jpeg', 'image/png', 'image/webp'];
+        if (!tiposPermitidos.includes(archivo.type)) {
+            showToast('Formato no permitido. Usa JPG, JPEG, PNG o WEBP.', 'error');
+            inputImagen.value = '';
+            return;
+        }
+        if (archivo.size > 2 * 1024 * 1024) {
+            showToast('La imagen no debe pesar más de 2 MB.', 'error');
+            inputImagen.value = '';
+            return;
+        }
+
+        const previewImg = document.getElementById('imagenPreviewImg');
+        const vaciaTxt = document.getElementById('imagenVaciaTxt');
+        const btnEliminar = document.getElementById('btnEliminarImagen');
+        if (previewImg.src && previewImg.src.startsWith('blob:')) {
+            URL.revokeObjectURL(previewImg.src);
+        }
+        previewImg.src = URL.createObjectURL(archivo);
+        previewImg.style.display = 'block';
+        vaciaTxt.style.display = 'none';
+        btnEliminar.style.display = 'none'; // hay un archivo nuevo pendiente de guardar
+    });
+});
+
+/* Elimina SOLO la imagen del producto (el producto se conserva) */
+async function eliminarImagenProducto() {
+    const id = document.getElementById('prodId').value;
+    if (!id) return;
+
+    const confirmado = await pirryConfirm({
+        icon: '🖼️',
+        title: '¿Eliminar la imagen?',
+        text: 'El producto quedará sin imagen. Esta acción no se puede deshacer.',
+        okText: 'Eliminar imagen',
+        cancelText: 'Cancelar',
+        danger: true,
+    });
+    if (!confirmado) return;
+
+    try {
+        const res = await fetch(`${routes.productos}/${id}/imagen`, {
+            method: 'DELETE',
+            headers: {
+                'X-CSRF-TOKEN': csrfToken,
+                'Accept': 'application/json',
+            },
+        });
+        const data = await res.json();
+
+        if (data.exito) {
+            await cargarProductos();
+            if (window.refrescarMenuTrasAdmin) window.refrescarMenuTrasAdmin();
+            resetearImagenModal(null);
+            showToast('La imagen se eliminó correctamente.', 'success', 4200, '¡Imagen eliminada!');
+        } else {
+            showToast(data.error || 'Error al eliminar la imagen.', 'error');
+        }
+    } catch (err) {
+        showToast('Error de conexión al eliminar la imagen.', 'error');
+    }
+}
+
 async function guardarProducto() {
     const id = document.getElementById('prodId').value;
     const precioRaw = document.getElementById('prodPrecio').value;
+    const precio = precioRaw === '' ? 0 : parseFloat(precioRaw);
 
-    const body = {
-        nombre: document.getElementById('prodNombre').value,
-        descripcion: document.getElementById('prodDescripcion').value,
-        precio: precioRaw === '' ? 0 : parseFloat(precioRaw),
-        id_categoria: parseInt(document.getElementById('prodCategoria').value),
-        disponible: document.getElementById('prodDisponible').checked,
-    };
-
-    if (!body.nombre || isNaN(body.precio) || body.precio < 0 || !body.id_categoria) {
+    if (!document.getElementById('prodNombre').value || isNaN(precio) || precio < 0 || !document.getElementById('prodCategoria').value) {
         showToast('Complete los campos obligatorios.', 'error');
         return;
+    }
+
+    // FormData (multipart) para poder incluir la imagen del producto
+    const formData = new FormData();
+    formData.append('nombre', document.getElementById('prodNombre').value);
+    formData.append('descripcion', document.getElementById('prodDescripcion').value);
+    formData.append('precio', String(precio));
+    formData.append('id_categoria', document.getElementById('prodCategoria').value);
+    formData.append('disponible', document.getElementById('prodDisponible').checked ? '1' : '0');
+
+    // Si no se eligió archivo, "imagen" no viaja: la imagen actual se conserva
+    const inputImagen = document.getElementById('prodImagen');
+    const archivoImagen = inputImagen && inputImagen.files && inputImagen.files[0];
+    if (archivoImagen) {
+        formData.append('imagen', archivoImagen);
     }
 
     const url = id ? `${routes.productos}/${id}` : routes.productos;
@@ -351,13 +462,21 @@ async function guardarProducto() {
         const res = await fetch(url, {
             method,
             headers: {
-                'Content-Type': 'application/json',
                 'X-CSRF-TOKEN': csrfToken,
                 'Accept': 'application/json',
             },
-            body: JSON.stringify(body),
+            body: formData,
         });
         const data = await res.json();
+
+        // Errores de validación de Laravel (formato/tamaño de imagen, etc.)
+        if (res.status === 422) {
+            const errores = data.errors || {};
+            const primerMensaje = (Object.values(errores)[0] && Object.values(errores)[0][0]) || data.message || 'Datos inválidos.';
+            showToast(primerMensaje, 'error');
+            return;
+        }
+
         if (data.exito) {
             cerrarModal();
             await cargarProductos();

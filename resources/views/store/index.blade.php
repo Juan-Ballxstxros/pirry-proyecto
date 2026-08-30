@@ -80,6 +80,14 @@
     <label>Descripción</label>
     <textarea id="prodDescripcion"></textarea>
 
+    <label>Imagen del producto</label>
+    <input type="file" id="prodImagen" accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp">
+    <div class="imagen-preview" id="imagenPreview">
+      <p class="imagen-vacia" id="imagenVaciaTxt">Sin imagen</p>
+      <img id="imagenPreviewImg" src="" alt="Vista previa de la imagen del producto" style="display:none">
+    </div>
+    <button type="button" class="btn-eliminar-imagen" id="btnEliminarImagen" onclick="eliminarImagenProducto()" style="display:none">🗑️ Eliminar imagen</button>
+
     <label>Precio ($) — opcional, no se muestra al cliente</label>
     <input type="number" id="prodPrecio" step="0.01" min="0">
 

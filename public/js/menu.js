@@ -165,9 +165,15 @@ function renderCardProducto(p) {
         <button class="btn-del-small" onclick="eliminarProducto(${p.id})">🗑️ Eliminar</button>
       </div>` : '';
 
+  // La API solo devuelve imagen cuando el admin subió una (ruta /storage).
+  // Sin imagen se conserva el diseño actual con el emoji de la categoría.
+  const visual = p.imagen
+    ? `<img class="menu-card-img" src="${p.imagen}" alt="${p.nombre}" loading="lazy">`
+    : `<div class="menu-card-icono" aria-hidden="true">${emojiDeCategoria(p.categoria)}</div>`;
+
   return `
     <article class="menu-card ${disponible ? '' : 'menu-card-agotado'}">
-      <div class="menu-card-icono" aria-hidden="true">${emojiDeCategoria(p.categoria)}</div>
+      ${visual}
       <h3 class="menu-card-nombre">${p.nombre}</h3>
       ${p.descripcion ? `<p class="menu-card-desc">${p.descripcion}</p>` : ''}
       <button class="btn-card-add" onclick="agregarAlCarrito(${p.id})" ${disponible ? '' : 'disabled'}>

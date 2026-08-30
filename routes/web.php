@@ -26,6 +26,7 @@ Route::get('/productos', [ProductController::class, 'index'])->name('productos.i
 Route::get('/productos/categorias', [ProductController::class, 'categorias'])->name('productos.categorias');
 Route::post('/productos', [ProductController::class, 'store'])->middleware('auth.session')->name('productos.store');
 Route::put('/productos/{producto}', [ProductController::class, 'update'])->middleware('auth.session')->name('productos.update');
+Route::delete('/productos/{producto}/imagen', [ProductController::class, 'eliminarImagen'])->middleware('auth.session')->name('productos.imagen.destroy');
 Route::delete('/productos/{producto}', [ProductController::class, 'destroy'])->middleware('auth.session')->name('productos.destroy');
 
 // Carrito

@@ -698,3 +698,43 @@ nav form button.btn-primary {
   color: #666;
   margin-bottom: 5px;
 }
+
+/* ========== IMAGEN DEL PRODUCTO (modal de admin) ========== */
+.imagen-preview {
+  margin-top: 10px;
+  text-align: center;
+}
+.imagen-preview img {
+  max-width: 100%;
+  max-height: 180px;
+  border-radius: 10px;
+  border: 1px solid #eee;
+  display: block;
+  margin: 0 auto;
+}
+.imagen-vacia {
+  font-size: 13px;
+  color: #999;
+  background: #fafafa;
+  border: 1px dashed #ddd;
+  border-radius: 8px;
+  padding: 16px;
+}
+.btn-eliminar-imagen {
+  margin-top: 10px;
+  width: 100%;
+  padding: 10px;
+  background: #dc3545;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 14px;
+}
+.btn-eliminar-imagen:hover {
+  background: #c82333;
+}
+.modal-content input[type="file"] {
+  width: 100%;
+  font-size: 14px;
+}
