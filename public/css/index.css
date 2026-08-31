@@ -481,6 +481,38 @@ footer a:hover{
 .btn-save:hover { background: #0056b3; }
 .btn-cancel:hover { background: #5a6268; }
 
+/* ========== BOTÓN WHATSAPP (modal del carrito) ========== */
+.btn-whatsapp {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  margin-top: 15px;
+  padding: 12px 20px;
+  background: #25d366;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(37, 211, 102, 0.35);
+  transition: background 0.2s, transform 0.15s;
+}
+.btn-whatsapp:hover {
+  background: #1fb857;
+  transform: translateY(-1px);
+}
+.btn-whatsapp:active {
+  transform: translateY(0);
+}
+.btn-whatsapp svg {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+}
+
 /* ========== CARRITO FLOTANTE ========== */
 #carrito-badge {
   position: fixed;

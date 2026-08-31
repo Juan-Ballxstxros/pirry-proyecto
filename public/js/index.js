@@ -288,6 +288,72 @@ async function confirmarPedido() {
     }
 }
 
+/* ============================================================
+   ENVIAR PEDIDO POR WHATSAPP
+   Toma la información que YA existe en el carrito (GET /carrito)
+   y la convierte en un mensaje de texto para WhatsApp.
+   • Usa solo nombre y cantidad: SIN precios ni totales monetarios.
+   • NO modifica el carrito (agregar/eliminar/cantidades quedan igual).
+   • El número del negocio se configura en .env → WHATSAPP_NUMERO_NEGOCIO
+     y llega aquí vía la variable whatsappConfig del layout. Mientras
+     esté vacío, el botón solo muestra un aviso (sin errores).
+   ============================================================ */
+function notificarAviso(mensaje, tipo, titulo) {
+    // Usa el sistema de toasts del proyecto (toast.js) si está disponible.
+    if (typeof showToast === 'function') {
+        showToast(mensaje, tipo, 5200, titulo);
+    }
+}
+
+async function enviarPedidoWhatsApp() {
+    // 1) Número del negocio (formato internacional, ej. 57XXXXXXXXXX).
+    const numero = ((window.whatsappConfig && window.whatsappConfig.numero) || '').trim();
+
+    if (!numero) {
+        notificarAviso(
+            'El administrador debe configurar el número de WhatsApp del negocio.',
+            'info',
+            'WhatsApp aún no está configurado'
+        );
+        return;
+    }
+
+    // 2) Lee el carrito existente (no lo modifica).
+    let data;
+    try {
+        const res = await fetch(routes.carritoShow, {
+            headers: { 'Accept': 'application/json' },
+        });
+        data = await res.json();
+    } catch (err) {
+        notificarAviso('No se pudo leer tu pedido. Intenta de nuevo.', 'error', '¡Ups!');
+        return;
+    }
+
+    // 3) Debe haber productos en el carrito.
+    if (!data.items || data.items.length === 0) {
+        notificarAviso('Tu carrito está vacío. Agrega productos para enviar tu pedido.', 'info', 'Carrito vacío');
+        return;
+    }
+
+    // 4) Mensaje con SOLO la información del pedido: nombre y cantidad.
+    //    Sin precios, sin $0 y sin totales monetarios.
+    let mensaje = 'Hola, quiero realizar el siguiente pedido:\n';
+    data.items.forEach(item => {
+        mensaje += '\n' + item.nombre + ' × ' + item.cantidad;
+    });
+
+    // 5) Abre WhatsApp con el mensaje ya preparado.
+    //    En celular abre la app de WhatsApp; en PC/laptop, WhatsApp Web.
+    try {
+        const url = 'https://wa.me/' + numero + '?text=' + encodeURIComponent(mensaje);
+        window.open(url, '_blank', 'noopener');
+    } catch (err) {
+        notificarAviso('No se pudo abrir WhatsApp. Intenta de nuevo.', 'error', '¡Ups!');
+    }
+}
+
+
 function mostrarNotificacion(msg) {
     const notif = document.createElement('div');
     notif.className = 'notif-toast';

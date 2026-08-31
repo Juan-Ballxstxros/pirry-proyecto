@@ -91,6 +91,12 @@ const routes = {
   login: '<?php echo e(route('login')); ?>',
 };
 
+// Configuración de WhatsApp del negocio (ver .env → WHATSAPP_NUMERO_NEGOCIO).
+// Mientras el número esté vacío, el botón de WhatsApp solo muestra un aviso.
+const whatsappConfig = {
+  numero: '<?php echo e(config('whatsapp.numero_negocio')); ?>',
+};
+
 // Mensajes flash de Laravel -> toasts bonitos
 window.flashMessages = window.flashMessages || [];
 <?php if(session('success')): ?>
