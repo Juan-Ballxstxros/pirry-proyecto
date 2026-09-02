@@ -36,6 +36,10 @@ class CartController extends Controller
             'items' => $items,
             'total' => $total,
             'count' => array_sum(array_column($cart, 'cantidad')),
+            // Estado de sesión real (Auth::check del sistema existente):
+            // lo usa el botón de WhatsApp para decidir si muestra el
+            // modal de inicio de sesión. No altera la lógica del carrito.
+            'logueado' => Auth::check(),
         ]);
     }
 

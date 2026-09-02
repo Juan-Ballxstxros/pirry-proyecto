@@ -258,6 +258,10 @@ async function eliminarDelCarrito(id) {
 }
 
 async function confirmarPedido() {
+    // La sesión la valida el SERVIDOR (Auth::check en el middleware):
+    // si responde 401, más abajo se muestra el modal de inicio de sesión.
+    // Así, una página abierta antes del login funciona igual en cuanto
+    // el usuario inicia sesión, sin depender de una variable "fija".
     try {
         const res = await fetch(routes.carritoConfirm, {
             method: 'POST',
@@ -270,9 +274,9 @@ async function confirmarPedido() {
         const data = await res.json();
 
         if (res.status === 401) {
-            if (confirm('Debes iniciar sesión para confirmar tu pedido. ¿Ir al login?')) {
-                window.location.href = routes.login;
-            }
+            // La sesión expiró a mitad del flujo: modal integrado en la
+            // página (sin confirm() nativo del navegador).
+            mostrarModalAuth();
             return;
         }
 
@@ -306,19 +310,7 @@ function notificarAviso(mensaje, tipo, titulo) {
 }
 
 async function enviarPedidoWhatsApp() {
-    // 1) Número del negocio (formato internacional, ej. 57XXXXXXXXXX).
-    const numero = ((window.whatsappConfig && window.whatsappConfig.numero) || '').trim();
-
-    if (!numero) {
-        notificarAviso(
-            'El administrador debe configurar el número de WhatsApp del negocio.',
-            'info',
-            'WhatsApp aún no está configurado'
-        );
-        return;
-    }
-
-    // 2) Lee el carrito existente (no lo modifica).
+    // 1) Lee el carrito existente (no lo modifica).
     let data;
     try {
         const res = await fetch(routes.carritoShow, {
@@ -330,20 +322,40 @@ async function enviarPedidoWhatsApp() {
         return;
     }
 
-    // 3) Debe haber productos en el carrito.
+    // 2) Debe haber productos en el carrito.
     if (!data.items || data.items.length === 0) {
         notificarAviso('Tu carrito está vacío. Agrega productos para enviar tu pedido.', 'info', 'Carrito vacío');
         return;
     }
 
-    // 4) Mensaje con SOLO la información del pedido: nombre y cantidad.
+    // 3) Validación de sesión con el ESTADO REAL del servidor:
+    //    campo 'logueado' que GET /carrito calcula con Auth::check()
+    //    (el mismo sistema de autenticación existente).
+    if (!data.logueado) {
+        mostrarModalAuth();
+        return;
+    }
+
+    // 4) Número del negocio (formato internacional, ej. 57XXXXXXXXXX).
+    const numero = ((window.whatsappConfig && window.whatsappConfig.numero) || '').trim();
+
+    if (!numero) {
+        notificarAviso(
+            'El administrador debe configurar el número de WhatsApp del negocio.',
+            'info',
+            'WhatsApp aún no está configurado'
+        );
+        return;
+    }
+
+    // 5) Mensaje con SOLO la información del pedido: nombre y cantidad.
     //    Sin precios, sin $0 y sin totales monetarios.
     let mensaje = 'Hola, quiero realizar el siguiente pedido:\n';
     data.items.forEach(item => {
         mensaje += '\n' + item.nombre + ' × ' + item.cantidad;
     });
 
-    // 5) Abre WhatsApp con el mensaje ya preparado.
+    // 6) Abre WhatsApp con el mensaje ya preparado.
     //    En celular abre la app de WhatsApp; en PC/laptop, WhatsApp Web.
     try {
         const url = 'https://wa.me/' + numero + '?text=' + encodeURIComponent(mensaje);
@@ -351,6 +363,30 @@ async function enviarPedidoWhatsApp() {
     } catch (err) {
         notificarAviso('No se pudo abrir WhatsApp. Intenta de nuevo.', 'error', '¡Ups!');
     }
+}
+
+/* ============================================================
+   VALIDACIÓN DE SESIÓN PARA CONFIRMAR / ENVIAR EL PEDIDO
+   La decide SIEMPRE el servidor con el sistema de autenticación
+   existente (Auth::check): confirmarPedido reacciona al 401 de la
+   API y enviarPedidoWhatsApp lee el campo 'logueado' de GET /carrito.
+   Así no se usa una "foto" del estado hecha al renderizar la página
+   (que quedaba obsoleta si el login ocurría después). Los botones
+   llevan a las páginas de login/registro que ya existen; el carrito
+   vive en la sesión y se conserva intacto tras iniciar sesión.
+   ============================================================ */
+function mostrarModalAuth() {
+    const modal = document.getElementById('modalAuth');
+    if (!modal) return;
+
+    // Cierra el modal del carrito para que no quede detrás del de sesión.
+    cerrarCarrito();
+    modal.style.display = 'flex';
+}
+
+function cerrarModalAuth() {
+    const modal = document.getElementById('modalAuth');
+    if (modal) modal.style.display = 'none';
 }
 
 

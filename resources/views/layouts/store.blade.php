@@ -89,6 +89,7 @@ const routes = {
   carritoRemove: '{{ route('carrito.remove') }}',
   carritoConfirm: '{{ route('carrito.confirm') }}',
   login: '{{ route('login') }}',
+  register: '{{ route('register') }}',
 };
 
 // Configuración de WhatsApp del negocio (ver .env → WHATSAPP_NUMERO_NEGOCIO).

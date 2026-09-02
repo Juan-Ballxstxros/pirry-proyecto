@@ -89,6 +89,7 @@ const routes = {
   carritoRemove: '<?php echo e(route('carrito.remove')); ?>',
   carritoConfirm: '<?php echo e(route('carrito.confirm')); ?>',
   login: '<?php echo e(route('login')); ?>',
+  register: '<?php echo e(route('register')); ?>',
 };
 
 // Configuración de WhatsApp del negocio (ver .env → WHATSAPP_NUMERO_NEGOCIO).

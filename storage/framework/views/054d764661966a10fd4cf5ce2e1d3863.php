@@ -104,6 +104,19 @@
   </div>
 </div>
 
+
+<div id="modalAuth" class="modal">
+  <div class="modal-content modal-auth-content">
+    <div class="modal-auth-icon" aria-hidden="true">🔒</div>
+    <h3>Debes iniciar sesión para continuar</h3>
+    <p class="modal-auth-texto">Para confirmar tu pedido necesitas iniciar sesión o crear una cuenta.</p>
+    <div class="modal-auth-buttons">
+      <a href="<?php echo e(route('login')); ?>" class="btn-auth-login">Iniciar sesión</a>
+      <a href="<?php echo e(route('register')); ?>" class="btn-auth-register">Crear cuenta</a>
+    </div>
+  </div>
+</div>
+
 <section id="Nosotros" class="section">
   <h2>¿Por qué elegir El Pirry?</h2>
   <div class="stats">
