@@ -79,9 +79,13 @@
 </div>
 
 <script>
-const isAdmin = {{ ($esAdmin ?? false) ? 'true' : 'false' }};
-const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
-const routes = {
+// Expuestos en window para que tanto el JS clásico como los módulos Vite
+// (Vue) accedan a la configuración generada por Blade. El JS antiguo sigue
+// funcionando igual: las referencias "routes", "csrfToken", etc. resuelven
+// contra el objeto global.
+window.isAdmin = {{ ($esAdmin ?? false) ? 'true' : 'false' }};
+window.csrfToken = document.querySelector('meta[name="csrf-token"]').content;
+window.routes = {
   productos: '{{ url('/productos') }}',
   carritoAdd: '{{ route('carrito.add') }}',
   carritoShow: '{{ route('carrito.show') }}',
@@ -94,9 +98,13 @@ const routes = {
 
 // Configuración de WhatsApp del negocio (ver .env → WHATSAPP_NUMERO_NEGOCIO).
 // Mientras el número esté vacío, el botón de WhatsApp solo muestra un aviso.
-const whatsappConfig = {
+window.whatsappConfig = {
   numero: '{{ config('whatsapp.numero_negocio') }}',
 };
+
+// Puente del carrito: app.js (Vue) define la función real al montar el
+// modal; este fallback evita errores si se hace clic antes de que cargue.
+window.verCarrito = window.verCarrito || function () {};
 
 // Mensajes flash de Laravel -> toasts bonitos
 window.flashMessages = window.flashMessages || [];
@@ -107,8 +115,13 @@ window.flashMessages = window.flashMessages || [];
   window.flashMessages.push({ type: 'error', message: @json(session('error')) });
 @endif
 </script>
+{{-- index.js (carrito/menú/CRUD clásico) ya NO se carga en esta página:
+    sus funciones las cubren ahora los componentes Vue. El archivo se
+    conserva en public/js/index.js como referencia. toast.js sigue activo. --}}
 <script src="{{ asset('js/toast.js') }}"></script>
-<script src="{{ asset('js/index.js') }}"></script>
+{{-- Vite + Vue: compila resources/js/app.js. En producción carga el build;
+    en desarrollo (npm run dev) conecta con el servidor HMR. --}}
+@vite(['resources/js/app.js'])
 @stack('scripts')
 </body>
 </html>

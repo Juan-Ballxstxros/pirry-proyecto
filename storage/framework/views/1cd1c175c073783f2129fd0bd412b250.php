@@ -79,9 +79,13 @@
 </div>
 
 <script>
-const isAdmin = <?php echo e(($esAdmin ?? false) ? 'true' : 'false'); ?>;
-const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
-const routes = {
+// Expuestos en window para que tanto el JS clásico como los módulos Vite
+// (Vue) accedan a la configuración generada por Blade. El JS antiguo sigue
+// funcionando igual: las referencias "routes", "csrfToken", etc. resuelven
+// contra el objeto global.
+window.isAdmin = <?php echo e(($esAdmin ?? false) ? 'true' : 'false'); ?>;
+window.csrfToken = document.querySelector('meta[name="csrf-token"]').content;
+window.routes = {
   productos: '<?php echo e(url('/productos')); ?>',
   carritoAdd: '<?php echo e(route('carrito.add')); ?>',
   carritoShow: '<?php echo e(route('carrito.show')); ?>',
@@ -94,9 +98,13 @@ const routes = {
 
 // Configuración de WhatsApp del negocio (ver .env → WHATSAPP_NUMERO_NEGOCIO).
 // Mientras el número esté vacío, el botón de WhatsApp solo muestra un aviso.
-const whatsappConfig = {
+window.whatsappConfig = {
   numero: '<?php echo e(config('whatsapp.numero_negocio')); ?>',
 };
+
+// Puente del carrito: app.js (Vue) define la función real al montar el
+// modal; este fallback evita errores si se hace clic antes de que cargue.
+window.verCarrito = window.verCarrito || function () {};
 
 // Mensajes flash de Laravel -> toasts bonitos
 window.flashMessages = window.flashMessages || [];
@@ -107,8 +115,10 @@ window.flashMessages = window.flashMessages || [];
   window.flashMessages.push({ type: 'error', message: <?php echo json_encode(session('error'), 15, 512) ?> });
 <?php endif; ?>
 </script>
+
 <script src="<?php echo e(asset('js/toast.js')); ?>"></script>
-<script src="<?php echo e(asset('js/index.js')); ?>"></script>
+
+<?php echo app('Illuminate\Foundation\Vite')(['resources/js/app.js']); ?>
 <?php echo $__env->yieldPushContent('scripts'); ?>
 </body>
 </html>
