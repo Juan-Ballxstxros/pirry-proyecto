@@ -557,8 +557,15 @@ async function guardarProducto() {
         formData.append('imagen', archivoImagen);
     }
 
+    // Method spoofing de Laravel (mismo fix que MenuProductos.vue): PHP no
+    // llena $_POST/$_FILES en un PUT real con multipart, por eso fallaba la
+    // validación "required". POST + _method=PUT llega igual al update().
+    if (id) {
+        formData.append('_method', 'PUT');
+    }
+
     const url = id ? `${routes.productos}/${id}` : routes.productos;
-    const method = id ? 'PUT' : 'POST';
+    const method = 'POST';
 
     try {
         const res = await fetch(url, {
