@@ -21,6 +21,12 @@ Route::get('/registro', [AuthController::class, 'showRegister'])->name('register
 Route::post('/registro', [AuthController::class, 'register'])->name('register.post');
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
+// Recuperación de contraseña (correo vía Resend)
+Route::get('/olvide-contrasena', [AuthController::class, 'showForgotPassword'])->name('password.request');
+Route::post('/olvide-contrasena', [AuthController::class, 'sendResetLink'])->name('password.email');
+Route::get('/restablecer-contrasena/{token}', [AuthController::class, 'showResetForm'])->name('password.reset');
+Route::post('/restablecer-contrasena', [AuthController::class, 'resetPassword'])->name('password.update');
+
 // Productos API
 Route::get('/productos', [ProductController::class, 'index'])->name('productos.index');
 Route::get('/productos/categorias', [ProductController::class, 'categorias'])->name('productos.categorias');

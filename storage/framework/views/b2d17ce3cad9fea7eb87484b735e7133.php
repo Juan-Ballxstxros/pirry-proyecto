@@ -46,7 +46,9 @@
                 <p class="register-link">
                     ¿No tienes una cuenta? <a href="<?php echo e(route('register')); ?>">Crear cuenta</a>
                 </p>
-                <p class="info-login">Si olvidó su contraseña, contacte al administrador del sistema.</p>
+                <p class="register-link">
+                    ¿Olvidaste tu contraseña? <a href="<?php echo e(route('password.request')); ?>">Recupérala aquí</a>
+                </p>
             </div>
         </form>
     </div>
