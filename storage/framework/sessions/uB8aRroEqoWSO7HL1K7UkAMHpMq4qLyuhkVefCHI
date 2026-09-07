@@ -1,1 +1,0 @@
-a:4:{s:6:"_token";s:40:"i6YSDWxLlCXq9zGFnGzfrb3GfWIBiXIP7JmPT786";s:9:"_previous";a:1:{s:3:"url";s:27:"http://localhost:8010/login";}s:6:"_flash";a:2:{s:3:"old";a:0:{}s:3:"new";a:0:{}}s:27:"password_reset_requested_at";O:25:"Illuminate\Support\Carbon":3:{s:4:"date";s:26:"2026-09-05 16:06:46.912680";s:13:"timezone_type";i:3;s:8:"timezone";s:14:"America/Bogota";}}
