@@ -106,15 +106,22 @@ class AuthController extends Controller
     }
 
     /**
-     * Devuelve el id de un rol válido para el nuevo cliente.
-     * Orden de búsqueda: rol "Cliente" -> cualquier rol existente.
-     * Si la tabla de roles está vacía, crea el rol "Cliente" para que
-     * el registro nunca falle por la llave foránea id_rol.
+     * Devuelve el id del rol "Cliente" para los nuevos registros públicos.
+     *
+     * Reglas de seguridad:
+     * - El rol se busca sin distinguir mayúsculas/minúsculas.
+     * - Si no existe, se crea el rol "Cliente" para que el registro
+     *   nunca falle por la llave foránea id_rol.
+     * - NUNCA se reutiliza otro rol existente (Administrador, empleado,
+     *   etc.): antes, el fallback al primer rol de la tabla asignaba
+     *   accidentalmente el rol Administrador (id 1) a cada registro nuevo.
+     * - El rol NO se toma del request: el formulario público ni siquiera
+     *   lo envía, y aunque alguien lo manipule manualmente, aquí siempre
+     *   se asigna el rol Cliente.
      */
     private function resolverRolCliente(): int
     {
-        $rol = Role::where('nombre', 'Cliente')->first()
-            ?? Role::orderBy('id_roles')->first();
+        $rol = Role::whereRaw('LOWER(nombre) = ?', ['cliente'])->first();
 
         if ($rol) {
             return (int) $rol->id_roles;
