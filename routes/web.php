@@ -21,7 +21,7 @@ Route::get('/registro', [AuthController::class, 'showRegister'])->name('register
 Route::post('/registro', [AuthController::class, 'register'])->name('register.post');
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
-// Recuperación de contraseña (correo vía Resend)
+// Recuperación de contraseña (correo vía Gmail API)
 Route::get('/olvide-contrasena', [AuthController::class, 'showForgotPassword'])->name('password.request');
 Route::post('/olvide-contrasena', [AuthController::class, 'sendResetLink'])->name('password.email');
 Route::get('/restablecer-contrasena/{token}', [AuthController::class, 'showResetForm'])->name('password.reset');

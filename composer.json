@@ -4,8 +4,8 @@
     "description": "El Pirry - Comidas Rápidas",
     "require": {
         "php": "^8.2",
-        "laravel/framework": "^11.0",
-        "resend/resend-php": "^1.13"
+        "google/apiclient": "^2.19.4",
+        "laravel/framework": "^11.0"
     },
     "require-dev": {
         "fakerphp/faker": "^1.23"
@@ -23,6 +23,7 @@
         }
     },
     "scripts": {
+        "pre-autoload-dump": "Google\\Task\\Composer::cleanup",
         "post-autoload-dump": [
             "Illuminate\\Foundation\\ComposerScripts::postAutoloadDump",
             "@php artisan package:discover --ansi"
@@ -43,5 +44,10 @@
         }
     },
     "minimum-stability": "stable",
-    "prefer-stable": true
+    "prefer-stable": true,
+    "extra": {
+        "google/apiclient-services": [
+            "Gmail"
+        ]
+    }
 }

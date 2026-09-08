@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Role;
 use App\Models\Usuario;
-use App\Services\ResendMailer;
+use App\Services\GmailMailer;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -145,7 +145,7 @@ class AuthController extends Controller
     }
 
     /* ---------------------------------------------------------------------
-     |  Recuperación de contraseña (correo enviado con Resend)
+     |  Recuperación de contraseña (correo enviado con Gmail API)
      | ---------------------------------------------------------------------
      |  Flujo: el usuario pide un enlace -> se genera un token aleatorio que
      |  se guarda HASHEADO (sha256) en la columna reset_token de la tabla
@@ -168,7 +168,7 @@ class AuthController extends Controller
 
     /**
      * Procesa la solicitud de recuperación: genera el token temporal y envía
-     * el enlace por correo usando la API de Resend.
+     * el enlace por correo usando la API de Gmail (Google).
      *
      * Seguridad: responde SIEMPRE con el mismo mensaje de éxito, exista o no
      * el correo, para que no se pueda averiguar qué correos están
@@ -209,14 +209,16 @@ class AuthController extends Controller
             $url = route('password.reset', ['token' => $token]);
 
             try {
-                app(ResendMailer::class)->sendPasswordReset($usuario, $url);
+                app(GmailMailer::class)->sendPasswordReset($usuario, $url);
             } catch (\Throwable $e) {
                 report($e);
 
-                // Sin API key configurada se registra el enlace para poder
-                // probar el flujo en local (solo en entorno local).
+                // Sin credenciales configuradas o si Gmail API falla, se
+                // registra el enlace para poder probar el flujo en local
+                // (solo en entorno local). El report() anterior registra el
+                // error saneado, sin secretos.
                 if (app()->environment('local')) {
-                    logger()->warning('[Resend] Correo no enviado. Enlace de recuperación generado para pruebas: '.$url);
+                    logger()->warning('[Gmail] Correo no enviado. Enlace de recuperación generado para pruebas: '.$url);
                 }
             }
         }

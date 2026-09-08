@@ -8,21 +8,24 @@ return [
     |--------------------------------------------------------------------------
     |
     | Este archivo almacena las credenciales de servicios externos como
-    | Resend, Mailgun, Postmark, AWS y otros. Las claves NUNCA se escriben
+    | Mailgun, Postmark, AWS y otros. Las claves NUNCA se escriben
     | aquí: se leen desde las variables de entorno definidas en el .env.
     |
     */
 
-    'resend' => [
-        // API Key de Resend (https://resend.com/api-keys) -> variable RESEND_API_KEY en .env
-        'key' => env('RESEND_API_KEY'),
+    'gmail' => [
+        // Credenciales OAuth 2.0 de Google para enviar el correo con la API
+        // de Gmail. Consíguelas en https://console.cloud.google.com
+        // (Credenciales -> ID de cliente OAuth, tipo "Aplicación de escritorio")
+        // y registra la URI de redirección http://127.0.0.1:8765.
+        // El refresh token se obtiene con: php artisan gmail:authorize
+        'client_id' => env('GOOGLE_CLIENT_ID'),
+        'client_secret' => env('GOOGLE_CLIENT_SECRET'),
+        'refresh_token' => env('GOOGLE_REFRESH_TOKEN'),
 
-        // Remitente del correo. Con una cuenta nueva de Resend sin dominio
-        // verificado solo se puede enviar desde onboarding@resend.dev.
-        'from_email' => env('RESEND_FROM_EMAIL', 'onboarding@resend.dev'),
-
-        // Nombre visible del remitente.
-        'from_name' => env('RESEND_FROM_NAME', 'El Pirry'),
+        // Remitente: DEBE ser exactamente el correo de la cuenta de Google
+        // autorizada en el paso de autorización (cuenta emisora del sistema).
+        'from_email' => env('GOOGLE_GMAIL_FROM'),
     ],
 
 ];
