@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Mail\ResetPasswordMail;
+use App\Services\GmailMailer;
 use App\Models\Usuario;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -61,9 +61,7 @@ class PasswordResetController extends Controller
         ]);
 
         try {
-            Mail::to($usuario->correo)->send(
-                new ResetPasswordMail($usuario->nombre, $resetUrl, self::MINUTOS_EXPIRACION)
-            );
+            app(GmailMailer::class)->sendPasswordReset($usuario, $resetUrl);
         } catch (\Throwable $e) {
             report($e);
 
