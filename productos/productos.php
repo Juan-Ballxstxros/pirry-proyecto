@@ -1,6 +1,6 @@
 <?php
 session_start();
-require 'conexion.php';
+require '../conexion.php';
 require 'verificar_admin.php';
 header('Content-Type: application/json');
 
