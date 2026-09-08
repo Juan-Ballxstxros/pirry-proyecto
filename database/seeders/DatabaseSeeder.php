@@ -3,8 +3,10 @@
 namespace Database\Seeders;
 
 use App\Models\Category;
+use App\Models\Ingrediente;
 use App\Models\Permission;
 use App\Models\Product;
+use App\Models\Proveedor;
 use App\Models\Role;
 use App\Models\Usuario;
 use Illuminate\Database\Seeder;
@@ -19,6 +21,7 @@ class DatabaseSeeder extends Seeder
         $this->seedPermissions();
         $this->seedUsers();
         $this->seedCategoriesAndProducts();
+        $this->seedProveedoresEIngredientes();
     }
 
     private function seedRoles(): void
@@ -145,5 +148,76 @@ class DatabaseSeeder extends Seeder
                 'estado' => 'activo',
             ]));
         }
+    }
+
+    /**
+     * Datos de ejemplo para los nuevos módulos de Proveedores e Ingredientes,
+     * incluyendo sus relaciones con productos (receta) y una compra inicial.
+     */
+    private function seedProveedoresEIngredientes(): void
+    {
+        if (Proveedor::count() > 0 || Ingrediente::count() > 0) {
+            return;
+        }
+
+        $carnesYA = Proveedor::create([
+            'nombre' => 'Carnes y Algo Más S.A.S',
+            'identificacion' => '900123456-1',
+            'telefono' => '3001112233',
+            'direccion' => 'Cra 50 #10-20, Guayabal',
+            'email' => 'ventas@carnesyalgomas.com',
+            'estado' => 'activo',
+        ]);
+
+        $distribuidoraPapa = Proveedor::create([
+            'nombre' => 'Distribuidora La Papa Dorada',
+            'identificacion' => '900987654-2',
+            'telefono' => '3007778899',
+            'direccion' => 'Calle 30 #45-12, Itagüí',
+            'email' => 'contacto@lapapadorada.com',
+            'estado' => 'activo',
+        ]);
+
+        $panDelBarrio = Ingrediente::create(['nombre' => 'Pan de hamburguesa', 'unidad_medida' => 'unidad', 'stock_actual' => 150, 'stock_minimo' => 30, 'estado' => 'activo']);
+        $carneRes = Ingrediente::create(['nombre' => 'Carne de res molida', 'unidad_medida' => 'kg', 'stock_actual' => 25, 'stock_minimo' => 10, 'estado' => 'activo']);
+        $papaFresca = Ingrediente::create(['nombre' => 'Papa fresca', 'unidad_medida' => 'kg', 'stock_actual' => 40, 'stock_minimo' => 15, 'estado' => 'activo']);
+        $quesoMozzarella = Ingrediente::create(['nombre' => 'Queso mozzarella', 'unidad_medida' => 'kg', 'stock_actual' => 8, 'stock_minimo' => 10, 'estado' => 'activo']);
+
+        // RI-032: qué proveedor surte cada ingrediente.
+        $carnesYA->ingredientes()->attach([
+            $panDelBarrio->id => ['disponible' => true, 'precio_referencia' => 400, 'fecha_actualizacion' => now()],
+            $carneRes->id => ['disponible' => true, 'precio_referencia' => 18000, 'fecha_actualizacion' => now()],
+            $quesoMozzarella->id => ['disponible' => true, 'precio_referencia' => 22000, 'fecha_actualizacion' => now()],
+        ]);
+        $distribuidoraPapa->ingredientes()->attach([
+            $papaFresca->id => ['disponible' => true, 'precio_referencia' => 2500, 'fecha_actualizacion' => now()],
+        ]);
+
+        // Receta: qué ingredientes usa cada producto del menú (si existen).
+        $hamburguesaSencilla = Product::where('nombre', 'Hamburguesa Sencilla')->first();
+        $salchipapaClasica = Product::where('nombre', 'Salchipapa Clásica')->first();
+
+        if ($hamburguesaSencilla) {
+            $hamburguesaSencilla->ingredientes()->attach([
+                $panDelBarrio->id => ['cantidad_requerida' => 1],
+                $carneRes->id => ['cantidad_requerida' => 0.15],
+            ]);
+        }
+
+        if ($salchipapaClasica) {
+            $salchipapaClasica->ingredientes()->attach([
+                $papaFresca->id => ['cantidad_requerida' => 0.3],
+            ]);
+        }
+
+        // RF-031: una compra inicial de ejemplo (también deja historial para el módulo de compras).
+        DB::table('compras_ingredientes')->insert([
+            'id_ingrediente' => $carneRes->id,
+            'id_proveedor' => $carnesYA->id,
+            'cantidad' => 25,
+            'precio_unitario' => 18000,
+            'total' => 25 * 18000,
+            'fecha' => now()->subDays(2),
+        ]);
     }
 }

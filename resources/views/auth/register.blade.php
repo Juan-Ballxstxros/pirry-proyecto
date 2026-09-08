@@ -1,84 +1,58 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Crear Cuenta - El Pirry</title>
-<link rel="stylesheet" href="{{ asset('css/login.css') }}">
-<link rel="stylesheet" href="{{ asset('css/toast.css') }}">
-</head>
-<body>
+@extends('layouts.auth')
 
-<div class="contenedor">
-    <div class="left">
-        <div class="texto">
-            <h1>Únete a El Pirry</h1>
-            <p>Crea tu cuenta y disfruta de nuestro menú</p>
+@section('title', 'Crear Cuenta - El Pirry')
+
+@section('side_title')
+    <h1 class="display-6">Únete a El Pirry</h1>
+@endsection
+@section('side_text')
+    <p class="fs-5 opacity-75">Crea tu cuenta y disfruta de nuestro menú completo.</p>
+@endsection
+
+@section('content')
+<h2 class="fw-bold mb-4">Crear cuenta</h2>
+
+@if($errors->any())
+    <div class="alert alert-danger">
+        @foreach($errors->all() as $error)
+            <div>{{ $error }}</div>
+        @endforeach
+    </div>
+@endif
+
+<form action="{{ route('register.post') }}" method="POST">
+    @csrf
+    <div class="row g-3 mb-3">
+        <div class="col-md-6">
+            <label class="form-label">Nombre completo</label>
+            <input type="text" name="nombre" class="form-control" value="{{ old('nombre') }}" required>
+        </div>
+        <div class="col-md-6">
+            <label class="form-label">Documento</label>
+            <input type="text" name="documento" class="form-control" value="{{ old('documento') }}" required>
+        </div>
+        <div class="col-md-6">
+            <label class="form-label">Correo electrónico</label>
+            <input type="email" name="correo" class="form-control" value="{{ old('correo') }}" required>
+        </div>
+        <div class="col-md-6">
+            <label class="form-label">Usuario</label>
+            <input type="text" name="usuario" class="form-control" value="{{ old('usuario') }}" required>
+        </div>
+        <div class="col-md-6">
+            <label class="form-label">Contraseña</label>
+            <input type="password" name="contrasena" class="form-control" required minlength="6">
+        </div>
+        <div class="col-md-6">
+            <label class="form-label">Confirmar contraseña</label>
+            <input type="password" name="contrasena_confirmation" class="form-control" required minlength="6">
         </div>
     </div>
 
-    <div class="right">
-        <form action="{{ route('register.post') }}" method="POST" class="login-box register-box">
-            @csrf
-            <h2>Crear Cuenta</h2>
-
-            @if($errors->any())
-                <div class="alert-error">
-                    @foreach($errors->all() as $error)
-                        <p>{{ $error }}</p>
-                    @endforeach
-                </div>
-            @endif
-
-            <div class="input-box">
-                <label>Nombre completo</label>
-                <input type="text" name="nombre" value="{{ old('nombre') }}" required>
-            </div>
-
-            <div class="input-box">
-                <label>Documento</label>
-                <input type="text" name="documento" value="{{ old('documento') }}" required>
-            </div>
-
-            <div class="input-box">
-                <label>Correo electrónico</label>
-                <input type="email" name="correo" value="{{ old('correo') }}" required>
-            </div>
-
-            <div class="input-box">
-                <label>Usuario</label>
-                <input type="text" name="usuario" value="{{ old('usuario') }}" required>
-            </div>
-
-            <div class="input-box">
-                <label>Contraseña</label>
-                <input type="password" name="contrasena" required minlength="6">
-            </div>
-
-            <div class="input-box">
-                <label>Confirmar contraseña</label>
-                <input type="password" name="contrasena_confirmation" required minlength="6">
-            </div>
-
-            <div class="botones">
-                <button type="submit" class="btn ingresar">Registrarse</button>
-                <a href="{{ route('login') }}" class="btn volver">Ya tengo cuenta</a>
-                <a href="{{ route('home') }}" class="btn volver">Volver al inicio</a>
-            </div>
-        </form>
+    <button type="submit" class="btn btn-pirry btn-lg w-100 mb-3">Registrarse</button>
+    <div class="d-flex gap-2">
+        <a href="{{ route('login') }}" class="btn btn-outline-secondary w-100">Ya tengo cuenta</a>
+        <a href="{{ route('home') }}" class="btn btn-outline-secondary w-100">Volver</a>
     </div>
-</div>
-
-<script>
-window.flashMessages = window.flashMessages || [];
-@if(session('success'))
-  window.flashMessages.push({ type: 'success', message: @json(session('success')) });
-@endif
-@if(session('error'))
-  window.flashMessages.push({ type: 'error', message: @json(session('error')) });
-@endif
-</script>
-<script src="{{ asset('js/toast.js') }}"></script>
-
-</body>
-</html>
+</form>
+@endsection

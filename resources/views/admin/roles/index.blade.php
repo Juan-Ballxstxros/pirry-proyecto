@@ -1,26 +1,29 @@
 @extends('layouts.admin')
 
 @section('title', 'Roles')
-
-@push('styles')
-<link rel="stylesheet" href="{{ asset('css/roles.css') }}">
-@endpush
+@section('page_title', 'Roles')
+@section('page_subtitle', 'Gestión de roles del sistema')
 
 @section('content')
-<h1>Gestión de Roles</h1>
 
 <div class="card">
-    <h3>Crear Nuevo Rol</h3>
-    <form method="POST" action="{{ route('admin.roles.store') }}" class="formulario">
+    <h3>Crear nuevo rol</h3>
+    <form method="POST" action="{{ route('admin.roles.store') }}" class="formulario form-inline">
         @csrf
-        <input type="text" name="nombre" placeholder="Nombre del rol" required>
-        <input type="text" name="descripcion" placeholder="Descripción" required>
-        <button type="submit">Guardar</button>
+        <div>
+            <label>Nombre</label>
+            <input type="text" name="nombre" placeholder="Ej: Vendedor" required>
+        </div>
+        <div>
+            <label>Descripción</label>
+            <input type="text" name="descripcion" placeholder="Breve descripción del rol" required>
+        </div>
+        <button type="submit" class="btn guardar">Guardar</button>
     </form>
 </div>
 
-<div class="card">
-    <h3>Roles Registrados</h3>
+<div class="tabla">
+    <h3>Roles registrados</h3>
     <table>
         <tr>
             <th>ID</th>
@@ -29,21 +32,27 @@
             <th>Estado</th>
             <th>Acción</th>
         </tr>
-        @foreach($roles as $rol)
+        @forelse($roles as $rol)
         <tr>
             <td>{{ $rol->id_roles }}</td>
             <td>{{ $rol->nombre }}</td>
             <td>{{ $rol->descripcion }}</td>
-            <td class="{{ strtolower($rol->estado) }}">{{ $rol->estado }}</td>
+            <td>
+                <span class="pill {{ strtolower($rol->estado) === 'activo' ? 'pill-activo' : 'pill-inactivo' }}">
+                    {{ $rol->estado }}
+                </span>
+            </td>
             <td>
                 <form action="{{ route('admin.roles.toggle', $rol) }}" method="POST" style="display:inline">
                     @csrf
                     @method('PATCH')
-                    <button type="submit" class="btn">Cambiar</button>
+                    <button type="submit" class="btn btn-sm btn-outline">Cambiar estado</button>
                 </form>
             </td>
         </tr>
-        @endforeach
+        @empty
+        <tr><td colspan="5" class="empty-state">No hay roles registrados.</td></tr>
+        @endforelse
     </table>
 </div>
 @endsection

@@ -43,6 +43,20 @@ class Usuario extends Authenticatable
         return $this->rol && strtolower($this->rol->nombre) === 'administrador';
     }
 
+    public function isEmpleado(): bool
+    {
+        return $this->rol && strtolower($this->rol->nombre) === 'empleado';
+    }
+
+    /**
+     * Admin o empleado: cualquiera de los dos puede entrar al panel interno
+     * (el panel de administrador conserva secciones exclusivas de admin).
+     */
+    public function isStaff(): bool
+    {
+        return $this->isAdmin() || $this->isEmpleado();
+    }
+
     public function isActive(): bool
     {
         return strtolower($this->estado) === 'activo';

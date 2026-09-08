@@ -58,7 +58,12 @@ class PermissionController extends Controller
     {
         $roles = Role::all();
         $permisos = Permission::all();
-        $asignados = DB::table('rol_permiso')->get();
+        $asignados = DB::table('rol_permiso')
+            ->join('roles', 'rol_permiso.id_roles', '=', 'roles.id_roles')
+            ->join('permisos', 'rol_permiso.id_permisos', '=', 'permisos.id_permisos')
+            ->select('rol_permiso.id_rol_permiso', 'roles.nombre as rol_nombre', 'permisos.nombre as permiso_nombre')
+            ->orderBy('roles.nombre')
+            ->get();
 
         return view('admin.permisos.assign', compact('roles', 'permisos', 'asignados'));
     }

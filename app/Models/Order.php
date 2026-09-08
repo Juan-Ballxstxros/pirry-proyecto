@@ -16,6 +16,7 @@ class Order extends Model
         'id_usuario',
         'total',
         'estado',
+        'forma_pago',
         'fecha',
     ];
 

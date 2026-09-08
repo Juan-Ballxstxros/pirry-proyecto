@@ -1,21 +1,19 @@
 @extends('layouts.admin')
 
 @section('title', 'Permisos')
-
-@push('styles')
-<link rel="stylesheet" href="{{ asset('css/permisos.css') }}">
-@endpush
+@section('page_title', 'Permisos')
+@section('page_subtitle', 'Permisos del sistema y su asignación a roles')
 
 @section('content')
 <div class="topbar">
-    <h1>Permisos</h1>
-    <div>
-        <a class="btn-crear" href="{{ route('admin.permisos.create') }}">+ Agregar</a>
-        <a class="btn-crear" href="{{ route('admin.permisos.assign') }}">Asignar a Rol</a>
+    <div></div>
+    <div style="display:flex; gap:10px;">
+        <a class="btn btn-outline" href="{{ route('admin.permisos.assign') }}">Asignar a rol</a>
+        <a class="btn btn-crear" href="{{ route('admin.permisos.create') }}">+ Agregar permiso</a>
     </div>
 </div>
 
-<div class="card">
+<div class="tabla">
     <table>
         <tr>
             <th>ID</th>
@@ -23,16 +21,18 @@
             <th>Descripción</th>
             <th>Acciones</th>
         </tr>
-        @foreach($permisos as $p)
+        @forelse($permisos as $p)
         <tr>
             <td>{{ $p->id_permisos }}</td>
             <td>{{ $p->nombre }}</td>
             <td>{{ $p->descripcion }}</td>
             <td>
-                <a href="{{ route('admin.permisos.edit', $p) }}" class="btn">Editar</a>
+                <a href="{{ route('admin.permisos.edit', $p) }}" class="btn btn-sm btn-outline">Editar</a>
             </td>
         </tr>
-        @endforeach
+        @empty
+        <tr><td colspan="4" class="empty-state">No hay permisos registrados.</td></tr>
+        @endforelse
     </table>
 </div>
 @endsection

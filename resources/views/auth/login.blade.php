@@ -1,69 +1,44 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Iniciar Sesión - El Pirry</title>
-<link rel="stylesheet" href="{{ asset('css/login.css') }}">
-<link rel="stylesheet" href="{{ asset('css/toast.css') }}">
-</head>
-<body>
+@extends('layouts.auth')
 
-<div class="contenedor">
-    <div class="left">
-        <div class="texto">
-            <h1>Bienvenido</h1>
-            <p>Accede al sistema de gestión</p>
-        </div>
+@section('title', 'Iniciar Sesión - El Pirry')
+
+@section('side_title')
+    <h1 class="display-6">Bienvenido de nuevo</h1>
+@endsection
+@section('side_text')
+    <p class="fs-5 opacity-75">Inicia sesión para pedir tus salchipapas y hamburguesas favoritas.</p>
+@endsection
+
+@section('content')
+<h2 class="fw-bold mb-4">Iniciar sesión</h2>
+
+@if($errors->any())
+    <div class="alert alert-danger">
+        @foreach($errors->all() as $error)
+            <div>{{ $error }}</div>
+        @endforeach
+    </div>
+@endif
+
+<form action="{{ route('login.post') }}" method="POST">
+    @csrf
+    <div class="mb-3">
+        <label class="form-label">Correo</label>
+        <input type="email" name="correo" class="form-control form-control-lg" value="{{ old('correo') }}" required autofocus>
+    </div>
+    <div class="mb-2">
+        <label class="form-label">Contraseña</label>
+        <input type="password" name="contrasena" class="form-control form-control-lg" required>
+    </div>
+    <div class="mb-4 text-end">
+        <a href="{{ route('password.request') }}" class="link-secondary small">¿Olvidaste tu contraseña?</a>
     </div>
 
-    <div class="right">
-        <form action="{{ route('login.post') }}" method="POST" class="login-box">
-            @csrf
-            <h2>Iniciar Sesión</h2>
+    <button type="submit" class="btn btn-pirry btn-lg w-100 mb-3">Ingresar</button>
+    <a href="{{ route('home') }}" class="btn btn-outline-secondary w-100 mb-4">Volver a la tienda</a>
 
-            @if($errors->any())
-                <div class="alert-error">
-                    @foreach($errors->all() as $error)
-                        <p>{{ $error }}</p>
-                    @endforeach
-                </div>
-            @endif
-
-            <div class="input-box">
-                <label>Correo</label>
-                <input type="email" name="correo" value="{{ old('correo') }}" required>
-            </div>
-
-            <div class="input-box">
-                <label>Contraseña</label>
-                <input type="password" name="contrasena" required>
-            </div>
-
-            <div class="botones">
-                <button type="submit" class="btn ingresar">Ingresar</button>
-                <a href="{{ route('home') }}" class="btn volver">Volver</a>
-                <p class="register-link">
-                    ¿No tienes una cuenta? <a href="{{ route('register') }}">Crear cuenta</a>
-                </p>
-                <p class="register-link">
-                    ¿Olvidaste tu contraseña? <a href="{{ route('password.request') }}">Recupérala aquí</a>
-                </p>
-            </div>
-        </form>
-    </div>
-</div>
-
-<script>
-window.flashMessages = window.flashMessages || [];
-@if(session('success'))
-  window.flashMessages.push({ type: 'success', message: @json(session('success')) });
-@endif
-@if(session('error'))
-  window.flashMessages.push({ type: 'error', message: @json(session('error')) });
-@endif
-</script>
-<script src="{{ asset('js/toast.js') }}"></script>
-
-</body>
-</html>
+    <p class="text-center text-muted mb-0">
+        ¿No tienes una cuenta? <a href="{{ route('register') }}">Crear cuenta</a>
+    </p>
+</form>
+@endsection

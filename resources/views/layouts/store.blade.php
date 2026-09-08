@@ -5,37 +5,46 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="csrf-token" content="{{ csrf_token() }}">
 <title>@yield('title', 'El Pirry - Comidas Rápidas')</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 <link rel="stylesheet" href="{{ asset('css/index.css') }}">
 <link rel="stylesheet" href="{{ asset('css/toast.css') }}">
 @stack('styles')
 </head>
 <body>
 
-<nav>
-  <div class="logo">El Pirry</div>
-  <button class="nav-toggle" id="navToggle" aria-label="Menú">☰</button>
-  <ul id="navMenu">
-    <li><a href="{{ route('home') }}">Inicio</a></li>
-    <li><a href="{{ route('home') }}#Productos">Menú</a></li>
-    <li><a href="{{ route('home') }}#Nosotros">Nosotros</a></li>
-    <li class="nav-cart">
-      <a href="#" onclick="verCarrito(); return false;" class="cart-nav-btn" title="Ver carrito">🛒 <span id="navCartCount">0</span></a>
-    </li>
-    <li>
-      @auth
-        <span class="user-greet">Hola, {{ Auth::user()->nombre }}</span>
-        @if(Auth::user()->isAdmin())
-          <a href="{{ route('admin.dashboard') }}" class="btn-primary">Panel Admin</a>
-        @endif
-        <form action="{{ route('logout') }}" method="POST" style="display:inline" onsubmit="return confirmLogout(this)">
-          @csrf
-          <button type="submit" class="btn-primary">Cerrar sesión</button>
-        </form>
-      @else
-        <a href="{{ route('login') }}" class="btn-primary">Iniciar sesión</a>
-      @endauth
-    </li>
-  </ul>
+<nav class="navbar navbar-expand-lg navbar-dark sticky-top" style="background: linear-gradient(90deg,#ff8c42,#e6702a);">
+  <div class="container">
+    <a class="navbar-brand fw-bold fs-3" href="{{ route('home') }}">El Pirry</a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navMenu" aria-label="Menú">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navMenu">
+      <ul class="navbar-nav ms-auto align-items-lg-center gap-lg-2">
+        <li class="nav-item"><a class="nav-link" href="{{ route('home') }}">Inicio</a></li>
+        <li class="nav-item"><a class="nav-link" href="{{ route('home') }}#Productos">Menú</a></li>
+        <li class="nav-item"><a class="nav-link" href="{{ route('home') }}#Nosotros">Nosotros</a></li>
+        <li class="nav-item">
+          <a href="#" onclick="verCarrito(); return false;" class="nav-link cart-nav-btn" title="Ver carrito">🛒 <span id="navCartCount">0</span></a>
+        </li>
+        <li class="nav-item d-flex align-items-center gap-2 mt-2 mt-lg-0">
+          @auth
+            <span class="text-white-50 small user-greet">Hola, {{ Auth::user()->nombre }}</span>
+            @if(Auth::user()->isAdmin())
+              <a href="{{ route('admin.dashboard') }}" class="btn btn-light btn-sm fw-semibold">Panel Admin</a>
+            @elseif(Auth::user()->isEmpleado())
+              <a href="{{ route('empleado.dashboard') }}" class="btn btn-light btn-sm fw-semibold">Panel Empleado</a>
+            @endif
+            <form action="{{ route('logout') }}" method="POST" class="d-inline" onsubmit="return confirmLogout(this)">
+              @csrf
+              <button type="submit" class="btn btn-light btn-sm fw-semibold">Cerrar sesión</button>
+            </form>
+          @else
+            <a href="{{ route('login') }}" class="btn btn-light btn-sm fw-semibold">Iniciar sesión</a>
+          @endauth
+        </li>
+      </ul>
+    </div>
+  </div>
 </nav>
 
 @yield('content')
@@ -122,6 +131,7 @@ window.flashMessages = window.flashMessages || [];
 {{-- Vite + Vue: compila resources/js/app.js. En producción carga el build;
     en desarrollo (npm run dev) conecta con el servidor HMR. --}}
 @vite(['resources/js/app.js'])
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 @stack('scripts')
 </body>
 </html>

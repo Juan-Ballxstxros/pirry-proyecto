@@ -333,15 +333,9 @@ export default {
                 formData.append('disponible', this.form.disponible ? '1' : '0');
                 // Si no se eligió archivo, "imagen" no viaja: la imagen se conserva
                 if (this.archivoImagen) formData.append('imagen', this.archivoImagen);
-                // Method spoofing de Laravel: PHP NO llena $_POST/$_FILES en una
-                // petición PUT real con multipart/form-data, por lo que el
-                // update() recibía los campos vacíos y la validación "required"
-                // fallaba (422) aunque el formulario estuviera completo. Se envía
-                // POST con _method=PUT y el router de Laravel lo trata como PUT.
-                if (this.form.id) formData.append('_method', 'PUT');
                 const url = this.form.id ? this.routes.productos + '/' + this.form.id : this.routes.productos;
                 const res = await fetch(url, {
-                    method: 'POST',
+                    method: this.form.id ? 'PUT' : 'POST',
                     headers: { 'X-CSRF-TOKEN': this.csrf, Accept: 'application/json' },
                     body: formData,
                 });

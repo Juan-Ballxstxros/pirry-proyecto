@@ -124,6 +124,11 @@ class CartController extends Controller
             return response()->json(['error' => 'El carrito está vacío'], 400);
         }
 
+        // RN-017: toda venta debe incluir al menos un método de pago.
+        $request->validate([
+            'forma_pago' => 'required|in:efectivo,tarjeta,transferencia,nequi,daviplata',
+        ]);
+
         $total = 0;
         foreach ($cart as $item) {
             $total += $item['precio'] * $item['cantidad'];
@@ -133,6 +138,7 @@ class CartController extends Controller
             'id_usuario' => Auth::id(),
             'total' => $total,
             'estado' => 'en_proceso',
+            'forma_pago' => $request->forma_pago,
             'fecha' => now(),
         ]);
 

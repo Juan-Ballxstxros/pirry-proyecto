@@ -31,6 +31,18 @@
                 </table>
             </div>
 
+            <!-- RN-017: toda venta debe incluir un método de pago. -->
+            <div class="form-pago" v-if="items.length > 0">
+                <label for="formaPago">Método de pago</label>
+                <select id="formaPago" v-model="formaPago">
+                    <option value="efectivo">Efectivo</option>
+                    <option value="tarjeta">Tarjeta</option>
+                    <option value="transferencia">Transferencia</option>
+                    <option value="nequi">Nequi</option>
+                    <option value="daviplata">Daviplata</option>
+                </select>
+            </div>
+
             <!-- Botón de envío del pedido por WhatsApp. Solo LEE el carrito
                  existente: no modifica productos, cantidades ni contadores. -->
             <button type="button" class="btn-whatsapp" @click="enviarPedidoWhatsApp">
@@ -74,6 +86,7 @@ export default {
             count: 0,
             logueado: false,
             procesando: false,
+            formaPago: 'efectivo',
         };
     },
     methods: {
@@ -132,6 +145,7 @@ export default {
                 const res = await fetch(this.routes.carritoConfirm, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': this.csrf, Accept: 'application/json' },
+                    body: JSON.stringify({ forma_pago: this.formaPago }),
                 });
                 if (res.status === 401) {
                     // La sesión la valida el SERVIDOR: si responde 401 se
