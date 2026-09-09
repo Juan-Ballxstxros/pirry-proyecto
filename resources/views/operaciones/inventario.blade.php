@@ -1,4 +1,4 @@
-@extends('layouts.empleado')
+@extends($layout)
 
 @section('title', 'Inventario')
 @section('page_title', 'Inventario de ingredientes')

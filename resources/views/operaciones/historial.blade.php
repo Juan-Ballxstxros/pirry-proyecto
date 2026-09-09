@@ -1,4 +1,4 @@
-@extends('layouts.empleado')
+@extends($layout)
 
 @section('title', 'Historial de Ventas')
 @section('page_title', 'Historial de ventas')
@@ -22,7 +22,7 @@
     <table>
         <tr>
             <th>#</th>
-            <th>Cliente</th>
+            <th>A nombre de</th>
             <th>Productos</th>
             <th>Total</th>
             <th>Pago</th>
@@ -32,7 +32,7 @@
         @forelse($pedidos as $pedido)
         <tr>
             <td>#{{ $pedido->id }}</td>
-            <td>{{ $pedido->usuario?->nombre ?? 'Invitado' }}</td>
+            <td>{{ $pedido->nombre_cliente ?? $pedido->usuario?->nombre ?? 'Invitado' }}</td>
             <td>
                 @foreach($pedido->items as $item)
                     {{ $item->cantidad }}× {{ $item->producto?->nombre ?? 'Producto eliminado' }}@if(!$loop->last), @endif

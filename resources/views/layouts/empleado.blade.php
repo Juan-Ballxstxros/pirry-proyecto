@@ -58,14 +58,6 @@
                     Ver Tienda
                 </a>
             </li>
-            @if(Auth::user()?->isAdmin())
-            <li>
-                <a href="{{ route('admin.dashboard') }}">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3 4 6.5V11c0 5 3.4 8.7 8 10 4.6-1.3 8-5 8-10V6.5L12 3Z"/></svg>
-                    Panel Admin
-                </a>
-            </li>
-            @endif
         </ul>
 
         <div class="sidebar-footer">

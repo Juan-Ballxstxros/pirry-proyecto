@@ -33,6 +33,27 @@
                 </a>
             </li>
 
+            <li class="sidebar-section-label">Operación</li>
+
+            <li class="{{ request()->routeIs('admin.pedidos.*') ? 'active' : '' }}">
+                <a href="{{ route('admin.pedidos.index') }}">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M8 9h8M8 13h5"/></svg>
+                    Pedidos
+                </a>
+            </li>
+            <li class="{{ request()->routeIs('admin.ventas.*') ? 'active' : '' }}">
+                <a href="{{ route('admin.ventas.create') }}">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                    Registrar venta
+                </a>
+            </li>
+            <li class="{{ request()->routeIs('admin.historial') ? 'active' : '' }}">
+                <a href="{{ route('admin.historial') }}">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 8v4l3 2"/><circle cx="12" cy="12" r="9"/></svg>
+                    Historial de ventas
+                </a>
+            </li>
+
             <li class="sidebar-section-label">Gestión</li>
 
             <li class="{{ request()->routeIs('admin.usuarios.*') ? 'active' : '' }}">
@@ -80,12 +101,6 @@
                 <a href="{{ route('home') }}">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9.5 12 4l9 5.5"/><path d="M4.5 8.5V20h15V8.5"/></svg>
                     Ver Tienda
-                </a>
-            </li>
-            <li>
-                <a href="{{ route('empleado.dashboard') }}">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="8" r="3.2"/><path d="M2.5 20c0-3.6 2.9-6.2 6.5-6.2s6.5 2.6 6.5 6.2"/></svg>
-                    Panel Empleados
                 </a>
             </li>
         </ul>

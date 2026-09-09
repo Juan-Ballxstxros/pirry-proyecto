@@ -13,12 +13,12 @@ class EmployeeMiddleware
     {
         $user = Auth::user();
 
-        if (! $user || ! $user->isStaff()) {
+        if (! $user || ! $user->isEmpleado()) {
             if ($request->expectsJson()) {
                 return response()->json(['error' => 'No autorizado'], 403);
             }
 
-            return redirect()->route('home')->with('error', 'Acceso denegado.');
+            return redirect()->route('home')->with('error', 'Esta sección es exclusiva para empleados registrados en el sistema.');
         }
 
         return $next($request);

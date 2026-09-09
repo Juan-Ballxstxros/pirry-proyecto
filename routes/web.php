@@ -10,7 +10,7 @@ use App\Http\Controllers\Admin\StatsController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CartController;
-use App\Http\Controllers\Empleado\EmployeeController;
+use App\Http\Controllers\OperacionesController;
 use App\Http\Controllers\PasswordResetController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\StoreController;
@@ -32,7 +32,8 @@ Route::post('/recuperar-password', [PasswordResetController::class, 'sendResetLi
 Route::get('/reset-password/{token}', [PasswordResetController::class, 'showResetForm'])->name('password.reset.form');
 Route::post('/reset-password', [PasswordResetController::class, 'reset'])->name('password.update');
 
-// Productos API
+// Productos API — el catálogo completo solo se pide desde el menú cuando
+// el usuario ya inició sesión (ver resources/views/store/index.blade.php).
 Route::get('/productos', [ProductController::class, 'index'])->name('productos.index');
 Route::get('/productos/categorias', [ProductController::class, 'categorias'])->name('productos.categorias');
 Route::post('/productos', [ProductController::class, 'store'])->middleware('auth.session')->name('productos.store');
@@ -54,18 +55,27 @@ Route::prefix('admin')->middleware(['auth.session', 'admin'])->group(function ()
     Route::get('/', [DashboardController::class, 'index'])->name('admin.dashboard');
     Route::get('/estadisticas', [StatsController::class, 'view'])->name('admin.estadisticas.index');
     Route::get('/api/estadisticas', [StatsController::class, 'index'])->name('admin.api.estadisticas');
+
+    // Usuarios
     Route::get('/usuarios', [UserController::class, 'index'])->name('admin.usuarios.index');
     Route::get('/usuarios/crear', [UserController::class, 'create'])->name('admin.usuarios.create');
     Route::post('/usuarios', [UserController::class, 'store'])->name('admin.usuarios.store');
     Route::patch('/usuarios/{usuario}/estado', [UserController::class, 'toggleEstado'])->name('admin.usuarios.toggle');
+    Route::delete('/usuarios/{usuario}', [UserController::class, 'destroy'])->name('admin.usuarios.destroy');
+
+    // Roles
     Route::get('/roles', [RoleController::class, 'index'])->name('admin.roles.index');
     Route::post('/roles', [RoleController::class, 'store'])->name('admin.roles.store');
     Route::patch('/roles/{role}/estado', [RoleController::class, 'toggleEstado'])->name('admin.roles.toggle');
+    Route::delete('/roles/{role}', [RoleController::class, 'destroy'])->name('admin.roles.destroy');
+
+    // Permisos
     Route::get('/permisos', [PermissionController::class, 'index'])->name('admin.permisos.index');
     Route::get('/permisos/crear', [PermissionController::class, 'create'])->name('admin.permisos.create');
     Route::post('/permisos', [PermissionController::class, 'store'])->name('admin.permisos.store');
     Route::get('/permisos/{permiso}/editar', [PermissionController::class, 'edit'])->name('admin.permisos.edit');
     Route::put('/permisos/{permiso}', [PermissionController::class, 'update'])->name('admin.permisos.update');
+    Route::delete('/permisos/{permiso}', [PermissionController::class, 'destroy'])->name('admin.permisos.destroy');
     Route::get('/permisos/asignar', [PermissionController::class, 'assignForm'])->name('admin.permisos.assign');
     Route::post('/permisos/asignar', [PermissionController::class, 'assign'])->name('admin.permisos.assign.post');
 
@@ -76,6 +86,7 @@ Route::prefix('admin')->middleware(['auth.session', 'admin'])->group(function ()
     Route::get('/proveedores/{proveedor}/editar', [ProveedorController::class, 'edit'])->name('admin.proveedores.edit');
     Route::put('/proveedores/{proveedor}', [ProveedorController::class, 'update'])->name('admin.proveedores.update');
     Route::patch('/proveedores/{proveedor}/estado', [ProveedorController::class, 'toggleEstado'])->name('admin.proveedores.toggle');
+    Route::delete('/proveedores/{proveedor}', [ProveedorController::class, 'destroy'])->name('admin.proveedores.destroy');
 
     // Ingredientes (relacionados con proveedores y productos)
     Route::get('/ingredientes', [IngredienteController::class, 'index'])->name('admin.ingredientes.index');
@@ -93,15 +104,26 @@ Route::prefix('admin')->middleware(['auth.session', 'admin'])->group(function ()
     Route::get('/compras', [CompraIngredienteController::class, 'index'])->name('admin.compras.index');
     Route::get('/compras/crear', [CompraIngredienteController::class, 'create'])->name('admin.compras.create');
     Route::post('/compras', [CompraIngredienteController::class, 'store'])->name('admin.compras.store');
+
+    // Operativo (pedidos/ventas/historial): las mismas funciones que tiene
+    // el panel de empleados, disponibles también para el administrador,
+    // sin que el admin tenga que entrar al panel de empleados.
+    Route::get('/pedidos', [OperacionesController::class, 'pedidos'])->name('admin.pedidos.index');
+    Route::patch('/pedidos/{pedido}/estado', [OperacionesController::class, 'actualizarEstadoPedido'])->name('admin.pedidos.estado');
+    Route::get('/ventas/crear', [OperacionesController::class, 'crearVenta'])->name('admin.ventas.create');
+    Route::post('/ventas', [OperacionesController::class, 'registrarVenta'])->name('admin.ventas.store');
+    Route::get('/historial', [OperacionesController::class, 'historial'])->name('admin.historial');
 });
 
-// Panel de empleados (RF-029/030): registrar ventas y consultar el historial.
+// Panel de empleados (RF-029/030): SOLO accesible para usuarios con rol
+// "Empleado" (ni administradores ni clientes). Registrar ventas, procesar
+// pedidos y consultar el historial e inventario.
 Route::prefix('empleado')->middleware(['auth.session', 'empleado'])->group(function () {
-    Route::get('/', [EmployeeController::class, 'dashboard'])->name('empleado.dashboard');
-    Route::get('/pedidos', [EmployeeController::class, 'pedidos'])->name('empleado.pedidos.index');
-    Route::patch('/pedidos/{pedido}/estado', [EmployeeController::class, 'actualizarEstadoPedido'])->name('empleado.pedidos.estado');
-    Route::get('/ventas/crear', [EmployeeController::class, 'crearVenta'])->name('empleado.ventas.create');
-    Route::post('/ventas', [EmployeeController::class, 'registrarVenta'])->name('empleado.ventas.store');
-    Route::get('/historial', [EmployeeController::class, 'historial'])->name('empleado.historial');
-    Route::get('/inventario', [EmployeeController::class, 'inventario'])->name('empleado.inventario');
+    Route::get('/', [OperacionesController::class, 'dashboard'])->name('empleado.dashboard');
+    Route::get('/pedidos', [OperacionesController::class, 'pedidos'])->name('empleado.pedidos.index');
+    Route::patch('/pedidos/{pedido}/estado', [OperacionesController::class, 'actualizarEstadoPedido'])->name('empleado.pedidos.estado');
+    Route::get('/ventas/crear', [OperacionesController::class, 'crearVenta'])->name('empleado.ventas.create');
+    Route::post('/ventas', [OperacionesController::class, 'registrarVenta'])->name('empleado.ventas.store');
+    Route::get('/historial', [OperacionesController::class, 'historial'])->name('empleado.historial');
+    Route::get('/inventario', [OperacionesController::class, 'inventario'])->name('empleado.inventario');
 });

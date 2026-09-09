@@ -1,4 +1,4 @@
-@extends('layouts.empleado')
+@extends($layout)
 
 @section('title', 'Pedidos')
 @section('page_title', 'Pedidos')
@@ -9,7 +9,7 @@
     <table>
         <tr>
             <th>#</th>
-            <th>Cliente</th>
+            <th>A nombre de</th>
             <th>Productos</th>
             <th>Total</th>
             <th>Pago</th>
@@ -20,7 +20,7 @@
         @forelse($pedidos as $pedido)
         <tr>
             <td>#{{ $pedido->id }}</td>
-            <td>{{ $pedido->usuario?->nombre ?? 'Invitado' }}</td>
+            <td>{{ $pedido->nombre_cliente ?? $pedido->usuario?->nombre ?? 'Invitado' }}</td>
             <td>
                 @foreach($pedido->items as $item)
                     {{ $item->cantidad }}× {{ $item->producto?->nombre ?? 'Producto eliminado' }}@if(!$loop->last), @endif
@@ -31,7 +31,7 @@
             <td><span class="pill pill-info">{{ ucfirst(str_replace('_', ' ', $pedido->estado)) }}</span></td>
             <td>{{ $pedido->fecha?->format('d/m/Y H:i') }}</td>
             <td>
-                <form action="{{ route('empleado.pedidos.estado', $pedido) }}" method="POST" class="formulario form-inline" style="gap:6px;">
+                <form action="{{ request()->routeIs('admin.*') ? route('admin.pedidos.estado', $pedido) : route('empleado.pedidos.estado', $pedido) }}" method="POST" class="formulario form-inline" style="gap:6px;">
                     @csrf
                     @method('PATCH')
                     <select name="estado" onchange="this.form.submit()" style="min-width:130px;">

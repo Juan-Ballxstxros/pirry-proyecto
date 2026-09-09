@@ -5,7 +5,7 @@
 @section('page_subtitle', 'Resumen general de la tienda')
 
 @push('scripts')
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.4/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
 @endpush
 
 @section('content')
@@ -125,7 +125,13 @@
 <script>
 (function () {
     fetch('{{ route('admin.api.estadisticas') }}?dias=14')
-        .then(r => r.json())
+        .then(async (r) => {
+            if (!r.ok) {
+                const texto = await r.text();
+                throw new Error('HTTP ' + r.status + ': ' + texto.slice(0, 500));
+            }
+            return r.json();
+        })
         .then(data => {
             const labels = data.ventas_por_dia.map(d => {
                 const [y, m, day] = d.fecha.split('-');
@@ -177,8 +183,11 @@
                 }
             });
         })
-        .catch(() => {
-            document.getElementById('chartVentas').closest('.chart-wrap').innerHTML = '<div class="chart-empty">No se pudieron cargar las estadísticas.</div>';
+        .catch((err) => {
+            console.error(err);
+            document.getElementById('chartVentas').closest('.chart-wrap').innerHTML =
+                '<div class="chart-empty" style="text-align:left; white-space:pre-wrap; font-family:monospace; font-size:11px;">' +
+                'ERROR AL CARGAR ESTADÍSTICAS:\n' + err.message + '</div>';
         });
 })();
 </script>

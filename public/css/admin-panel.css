@@ -71,6 +71,7 @@ a { color: inherit; }
     display: flex;
     flex-direction: column;
     transition: transform 0.25s ease;
+    overflow-y: auto;
 }
 
 .sidebar .logo {
@@ -179,8 +180,8 @@ a { color: inherit; }
 }
 
 .sidebar-logout:hover {
-    background: rgba(220, 38, 38, 0.15);
-    color: #fca5a5;
+    background: rgba(255, 255, 255, 0.08);
+    color: #fff;
 }
 
 .sidebar-toggle {
@@ -644,4 +645,12 @@ tbody tr:hover { background: #fafbfd; }
     .kpi-grid { grid-template-columns: 1fr; }
     table { font-size: 13px; }
     th, td { padding: 10px 8px; }
+}
+@media (max-width: 640px) {
+    .chart-wrap { 
+        height: 220px; /* Un poco más compacto en celular */
+    }
+    .chart-wrap.chart-sm { 
+        height: 200px; 
+    }
 }

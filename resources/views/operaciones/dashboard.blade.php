@@ -1,6 +1,6 @@
-@extends('layouts.empleado')
+@extends($layout)
 
-@section('title', 'Panel Empleado')
+@section('title', 'Panel Operativo')
 @section('page_title', 'Inicio')
 @section('page_subtitle', 'Resumen operativo del turno')
 
@@ -38,7 +38,7 @@
 
 <div class="topbar">
     <div></div>
-    <a class="btn btn-crear" href="{{ route('empleado.ventas.create') }}">+ Registrar venta</a>
+    <a class="btn btn-crear" href="{{ request()->routeIs('admin.*') ? route('admin.ventas.create') : route('empleado.ventas.create') }}">+ Registrar venta</a>
 </div>
 
 <div class="tabla">
@@ -46,7 +46,7 @@
     <table>
         <tr>
             <th>#</th>
-            <th>Cliente</th>
+            <th>A nombre de</th>
             <th>Total</th>
             <th>Estado</th>
             <th>Fecha</th>
@@ -54,7 +54,7 @@
         @forelse($ultimosPedidos as $pedido)
         <tr>
             <td>#{{ $pedido->id }}</td>
-            <td>{{ $pedido->usuario?->nombre ?? 'Invitado' }}</td>
+            <td>{{ $pedido->nombre_cliente ?? $pedido->usuario?->nombre ?? 'Invitado' }}</td>
             <td>${{ number_format($pedido->total, 0, ',', '.') }}</td>
             <td><span class="pill pill-info">{{ ucfirst(str_replace('_', ' ', $pedido->estado)) }}</span></td>
             <td>{{ $pedido->fecha?->format('d/m/Y H:i') }}</td>
