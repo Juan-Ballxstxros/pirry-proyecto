@@ -75,13 +75,30 @@ CREATE TABLE IF NOT EXISTS `productos` (
 -- Tablas de pedidos
 CREATE TABLE IF NOT EXISTS `pedidos` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
+  `codigo` varchar(20) DEFAULT NULL UNIQUE,
   `id_usuario` int(11) DEFAULT NULL,
+  `nombre_cliente` varchar(100) DEFAULT NULL,
   `total` decimal(10,2) DEFAULT 0.00,
-  `estado` varchar(30) DEFAULT 'en_proceso',
+  `estado` varchar(30) DEFAULT 'pendiente',
+  `forma_pago` varchar(30) DEFAULT 'efectivo',
   `fecha` datetime DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   KEY `id_usuario` (`id_usuario`),
   CONSTRAINT `pedidos_ibfk_1` FOREIGN KEY (`id_usuario`) REFERENCES `usuarios` (`id`) ON DELETE SET NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- Historial de cambios de estado (seguimiento de pedidos)
+CREATE TABLE IF NOT EXISTS `historial_pedidos` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `id_pedido` int(11) NOT NULL,
+  `estado_anterior` varchar(30) DEFAULT NULL,
+  `estado_nuevo` varchar(30) NOT NULL,
+  `id_usuario` int(11) DEFAULT NULL,
+  `fecha` datetime DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `id_pedido` (`id_pedido`),
+  CONSTRAINT `historial_pedidos_ibfk_1` FOREIGN KEY (`id_pedido`) REFERENCES `pedidos` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `historial_pedidos_ibfk_2` FOREIGN KEY (`id_usuario`) REFERENCES `usuarios` (`id`) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE IF NOT EXISTS `detalle_pedido` (

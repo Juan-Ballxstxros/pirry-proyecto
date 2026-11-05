@@ -564,6 +564,138 @@ tbody tr:hover { background: #fafbfd; }
 .formulario {
     display: flex;
     gap: 12px;
+
+/* ============ SEGUIMIENTO DE PEDIDOS (admin/empleado) ============ */
+
+/* Filtros de búsqueda */
+.pd-filtros {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    align-items: center;
+    margin-bottom: 18px;
+    padding: 14px 16px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+}
+.pd-input-busqueda {
+    flex: 1 1 260px;
+    min-width: 200px;
+    padding: 10px 14px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    font-size: 14px;
+}
+.pd-input-estado {
+    padding: 10px 12px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    font-size: 14px;
+    background: var(--surface);
+}
+.pd-btn-filtrar {
+    padding: 10px 18px;
+    background: var(--brand);
+    color: #fff;
+    border: none;
+    border-radius: var(--radius-sm);
+    font-weight: 600;
+    cursor: pointer;
+}
+.pd-btn-filtrar:hover { background: var(--brand-dark); }
+.pd-btn-limpiar {
+    padding: 10px 14px;
+    color: var(--text-muted);
+    text-decoration: none;
+    font-size: 14px;
+}
+
+/* Acciones de la fila */
+.pd-acciones { display: flex; gap: 8px; align-items: center; }
+.pd-btn-detalle {
+    padding: 6px 12px;
+    background: var(--info-bg);
+    color: var(--info);
+    border: none;
+    border-radius: var(--radius-sm);
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+}
+.pd-btn-detalle:hover { filter: brightness(0.95); }
+
+/* Pills de estado con color por estado */
+.pill-estado { font-weight: 600; }
+.pill-estado-pendiente { color: #d97706; background: #fef3e2; }
+.pill-estado-confirmado { color: #2563eb; background: #eaf1fe; }
+.pill-estado-en_preparacion { color: #c2410c; background: #ffedd5; }
+
+/* Modal de detalle del pedido */
+.pd-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 23, 42, 0.55);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    padding: 16px;
+}
+.pd-overlay[hidden] { display: none; }
+.pd-modal {
+    background: var(--surface);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-lg);
+    width: min(680px, 100%);
+    max-height: 88vh;
+    overflow-y: auto;
+    padding: 22px 24px;
+    position: relative;
+}
+.pd-cerrar {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    border: none;
+    background: var(--bg);
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 14px;
+}
+.pd-modal-titulo { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+.pd-modal-info p { margin: 3px 0; font-size: 14px; color: var(--text); }
+.pd-tabla-productos { margin-bottom: 16px; }
+
+/* Historial de estados */
+.pd-historial { list-style: none; margin: 0; padding: 0; }
+.pd-historial li {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    align-items: baseline;
+    padding: 8px 0;
+    border-bottom: 1px dashed var(--border);
+    font-size: 13px;
+}
+.pd-historial li:last-child { border-bottom: none; }
+.pd-hist-fecha { color: var(--text-muted); min-width: 120px; }
+.pd-hist-por { color: var(--text-muted); font-style: italic; }
+.pd-hist-vacio { color: var(--text-muted); }
+
+@media (max-width: 720px) {
+    .pd-filtros { flex-direction: column; align-items: stretch; }
+    .pd-acciones { flex-direction: column; align-items: stretch; gap: 6px; }
+    .pd-modal { padding: 16px; }
+}
+
+.pill-estado-listo { color: #0d9488; background: #ccfbf1; }
+.pill-estado-en_camino { color: #7c3aed; background: #ede9fe; }
+.pill-estado-entregado { color: #16a34a; background: #e9f9ef; }
+.pill-estado-cancelado { color: #dc2626; background: #fdecec; }
+
     flex-wrap: wrap;
     align-items: flex-end;
 }

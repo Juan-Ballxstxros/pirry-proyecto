@@ -13,6 +13,7 @@ use App\Http\Controllers\CartController;
 use App\Http\Controllers\OperacionesController;
 use App\Http\Controllers\PasswordResetController;
 use App\Http\Controllers\ProductController;
+use App\Http\Controllers\OrderTrackingController;
 use App\Http\Controllers\StoreController;
 use Illuminate\Support\Facades\Route;
 
@@ -49,6 +50,16 @@ Route::prefix('carrito')->group(function () {
     Route::post('/eliminar', [CartController::class, 'remove'])->name('carrito.remove');
     Route::post('/confirmar', [CartController::class, 'confirm'])->middleware('auth.session')->name('carrito.confirm');
 });
+
+// Seguimiento de pedidos del CLIENTE ("Mis pedidos"). Solo lectura: el
+// cliente nunca puede cambiar el estado (eso es exclusivo de admin/empleado).
+// La API fuerza el filtro por Auth::id(): un cliente no puede ver pedidos ajenos.
+Route::get('/mis-pedidos', [OrderTrackingController::class, 'index'])
+    ->middleware('auth.session')->name('mis-pedidos');
+Route::get('/api/mis-pedidos', [OrderTrackingController::class, 'api'])
+    ->middleware('auth.session')->name('mis-pedidos.api');
+Route::get('/api/mis-pedidos/{pedido}', [OrderTrackingController::class, 'detalle'])
+    ->middleware('auth.session')->name('mis-pedidos.detalle');
 
 // Panel administrador
 Route::prefix('admin')->middleware(['auth.session', 'admin'])->group(function () {

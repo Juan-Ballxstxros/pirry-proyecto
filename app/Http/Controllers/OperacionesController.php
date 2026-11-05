@@ -9,6 +9,7 @@ use App\Models\Product;
 use App\Models\Usuario;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 /**
@@ -31,7 +32,7 @@ class OperacionesController extends Controller
 
     public function dashboard()
     {
-        $pedidosPendientes = Order::where('estado', 'en_proceso')->count();
+        $pedidosPendientes = Order::whereIn('estado', Order::ESTADOS_ACTIVOS)->count();
         $ventasHoy = Order::whereDate('fecha', Carbon::today())->count();
         $ingredientesBajos = Ingrediente::where('estado', 'activo')
             ->whereColumn('stock_actual', '<=', 'stock_minimo')
@@ -44,22 +45,46 @@ class OperacionesController extends Controller
         ] + compact('pedidosPendientes', 'ventasHoy', 'ingredientesBajos', 'ultimosPedidos'));
     }
 
-    public function pedidos()
+    public function pedidos(Request $request)
     {
-        $pedidos = Order::with('usuario', 'items.producto')->orderByDesc('fecha')->paginate(20);
+        // Búsqueda por código o nombre del cliente + filtro por estado (RF panel).
+        $query = Order::with('usuario', 'items.producto', 'historial.usuario')->orderByDesc('fecha');
+
+        if ($request->filled('q')) {
+            $termino = trim($request->q);
+            $query->where(function ($sub) use ($termino) {
+                $sub->where('codigo', 'like', "%{$termino}%")
+                    ->orWhere('nombre_cliente', 'like', "%{$termino}%")
+                    ->orWhereHas('usuario', fn ($u) => $u->where('nombre', 'like', "%{$termino}%"));
+            });
+        }
+
+        if ($request->filled('estado') && in_array($request->estado, Order::ESTADOS, true)) {
+            $query->where('estado', $request->estado);
+        }
+
+        $pedidos = $query->paginate(20)->withQueryString();
 
         return view('operaciones.pedidos', ['layout' => $this->layout()] + compact('pedidos'));
     }
 
     public function actualizarEstadoPedido(Request $request, Order $pedido)
     {
+        // Validación en el SERVIDOR contra el catálogo de estados del seguimiento.
         $request->validate([
-            'estado' => 'required|in:en_proceso,preparando,listo,entregado,cancelado',
+            'estado' => 'required|in:'.implode(',', Order::ESTADOS),
         ]);
 
-        $pedido->update(['estado' => $request->estado]);
+        $estadoAnterior = $pedido->estado;
 
-        return back()->with('success', 'Estado del pedido #'.$pedido->id.' actualizado.');
+        if ($estadoAnterior !== $request->estado) {
+            $pedido->update(['estado' => $request->estado]);
+
+            // El cambio queda registrado en el historial con fecha y responsable.
+            $pedido->registrarCambioEstado($request->estado, Auth::id(), $estadoAnterior);
+        }
+
+        return back()->with('success', 'Estado del pedido '.$pedido->codigo.' actualizado.');
     }
 
     public function crearVenta()
@@ -105,7 +130,7 @@ class OperacionesController extends Controller
                 'id_usuario' => $request->id_usuario,
                 'nombre_cliente' => $request->nombre_cliente,
                 'total' => $total,
-                'estado' => 'en_proceso',
+                'estado' => Order::ESTADOS[0], // pendiente
                 'forma_pago' => $request->forma_pago,
                 'fecha' => now(),
             ]);
@@ -113,6 +138,9 @@ class OperacionesController extends Controller
             foreach ($lineas as $linea) {
                 OrderItem::create(array_merge(['id_pedido' => $pedido->id], $linea));
             }
+
+            // Primer registro del historial de seguimiento.
+            $pedido->registrarCambioEstado($pedido->estado, Auth::id());
 
             return $pedido;
         });

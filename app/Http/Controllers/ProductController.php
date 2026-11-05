@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Category;
+use App\Models\Order;
 use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -141,7 +142,7 @@ class ProductController extends Controller
         }
 
         $enProceso = $producto->detallePedidos()
-            ->whereHas('pedido', fn ($q) => $q->where('estado', 'en_proceso'))
+            ->whereHas('pedido', fn ($q) => $q->whereIn('estado', Order::ESTADOS_ACTIVOS))
             ->exists();
 
         if ($enProceso) {

@@ -17,6 +17,7 @@
 import { createApp } from 'vue';
 import MenuProductos from './components/MenuProductos.vue';
 import CarritoModal from './components/CarritoModal.vue';
+import MisPedidos from './components/MisPedidos.vue';
 
 /* ---------- Contador del carrito (event bus + badge) ---------- */
 function actualizarBadge(count) {
@@ -63,6 +64,14 @@ if (cartEl) {
 
     // El layout llama verCarrito() desde la nav y el badge flotante
     window.verCarrito = () => carrito.abrir();
+}
+
+/* ---------- Seguimiento "Mis pedidos" (cliente) ---------- */
+const misPedidosEl = document.getElementById('vue-mis-pedidos');
+if (misPedidosEl) {
+    createApp(MisPedidos, {
+        routes: window.routes,
+    }).mount(misPedidosEl);
 }
 
 /* ---------- Modal de autenticación (HTML en Blade) ---------- */

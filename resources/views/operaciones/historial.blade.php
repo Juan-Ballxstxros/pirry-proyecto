@@ -31,7 +31,7 @@
         </tr>
         @forelse($pedidos as $pedido)
         <tr>
-            <td>#{{ $pedido->id }}</td>
+            <td>{{ $pedido->codigo }}</td>
             <td>{{ $pedido->nombre_cliente ?? $pedido->usuario?->nombre ?? 'Invitado' }}</td>
             <td>
                 @foreach($pedido->items as $item)
@@ -40,7 +40,7 @@
             </td>
             <td>${{ number_format($pedido->total, 0, ',', '.') }}</td>
             <td>{{ ucfirst($pedido->forma_pago ?? '—') }}</td>
-            <td><span class="pill pill-info">{{ ucfirst(str_replace('_', ' ', $pedido->estado)) }}</span></td>
+            <td><span class="pill pill-estado pill-estado-{{ $pedido->estado }}">{{ ucfirst(str_replace('_', ' ', $pedido->estado)) }}</span></td>
             <td>{{ $pedido->fecha?->format('d/m/Y H:i') }}</td>
         </tr>
         @empty

@@ -23,6 +23,9 @@
         <li class="nav-item"><a class="nav-link" href="{{ route('home') }}">Inicio</a></li>
         <li class="nav-item"><a class="nav-link" href="{{ route('home') }}#Productos">Menú</a></li>
         <li class="nav-item"><a class="nav-link" href="{{ route('home') }}#Nosotros">Nosotros</a></li>
+        @auth
+          <li class="nav-item"><a class="nav-link" href="{{ route('mis-pedidos') }}">Mis pedidos</a></li>
+        @endauth
         <li class="nav-item">
           <a href="#" onclick="verCarrito(); return false;" class="nav-link cart-nav-btn" title="Ver carrito">🛒 <span id="navCartCount">0</span></a>
         </li>
@@ -101,6 +104,8 @@ window.routes = {
   carritoUpdate: '{{ route('carrito.update') }}',
   carritoRemove: '{{ route('carrito.remove') }}',
   carritoConfirm: '{{ route('carrito.confirm') }}',
+  misPedidos: '{{ route('mis-pedidos') }}',
+  misPedidosApi: '{{ route('mis-pedidos.api') }}',
   login: '{{ route('login') }}',
   register: '{{ route('register') }}',
 };

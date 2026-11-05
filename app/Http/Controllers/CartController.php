@@ -137,7 +137,7 @@ class CartController extends Controller
         $pedido = Order::create([
             'id_usuario' => Auth::id(),
             'total' => $total,
-            'estado' => 'en_proceso',
+            'estado' => Order::ESTADOS[0], // pendiente: el pedido acaba de ser recibido
             'forma_pago' => $request->forma_pago,
             'fecha' => now(),
         ]);
@@ -151,6 +151,9 @@ class CartController extends Controller
                 'subtotal' => $item['precio'] * $item['cantidad'],
             ]);
         }
+
+        // Primer registro del historial de seguimiento.
+        $pedido->registrarCambioEstado($pedido->estado, Auth::id());
 
         session()->forget('carrito');
 

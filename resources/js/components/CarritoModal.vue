@@ -52,6 +52,12 @@
                 Enviar pedido por WhatsApp
             </button>
 
+            <!-- Confirmación con acceso directo al seguimiento del pedido -->
+            <div class="mp-confirm-box" v-if="pedidoConfirmadoId">
+                <p class="mp-confirm-titulo">✅ ¡Pedido confirmado!</p>
+                <a class="mp-btn-seguimiento" :href="routes.misPedidos">Seguir mi pedido →</a>
+            </div>
+
             <div class="modal-buttons">
                 <button type="button" class="btn-cancel" @click="cerrar()">Seguir comprando</button>
                 <button type="button" class="btn-save" :disabled="procesando" @click="confirmarPedido">✅ Confirmar Pedido</button>
@@ -87,11 +93,14 @@ export default {
             logueado: false,
             procesando: false,
             formaPago: 'efectivo',
+            pedidoConfirmadoId: null,
         };
     },
     methods: {
         async abrir() {
             await this.cargarCarrito();
+            // Si el cliente agrega productos de nuevo, se limpia la caja de confirmación.
+            if (this.items.length > 0) this.pedidoConfirmadoId = null;
             this.abierto = true;
         },
         cerrar() {
@@ -156,8 +165,9 @@ export default {
                 const data = await res.json();
                 if (data.exito) {
                     this.toast('¡Pedido #' + data.pedido_id + ' confirmado! 🎉', 'success');
-                    this.abierto = false;
                     this.aplicarEstado({ items: [], total: 0, count: 0, logueado: this.logueado });
+                    // Se mantiene el modal abierto mostrando el acceso al seguimiento.
+                    this.pedidoConfirmadoId = data.pedido_id;
                 } else {
                     this.toast(data.error || 'Error al confirmar pedido');
                 }
