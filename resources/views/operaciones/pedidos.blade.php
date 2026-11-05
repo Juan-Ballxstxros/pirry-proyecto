@@ -1,3 +1,4 @@
+
 @extends($layout)
 
 @section('title', 'Pedidos')
@@ -31,7 +32,6 @@
 
 <div class="pirry-pedidos">
 
-    {{-- ENCABEZADO --}}
     <div class="rp-encabezado">
         <div>
             <span class="rp-etiqueta">PANEL DE CONTROL</span>
@@ -46,10 +46,9 @@
         </div>
     </div>
 
-    {{-- TARJETAS DE ESTADOS --}}
     <div class="rp-resumen">
 
-        <div class="rp-card rp-pendientes">
+        <div class="rp-card">
             <div class="rp-card-icono">◷</div>
             <div>
                 <span>Pendientes</span>
@@ -58,7 +57,7 @@
             </div>
         </div>
 
-        <div class="rp-card rp-preparacion">
+        <div class="rp-card">
             <div class="rp-card-icono">♨</div>
             <div>
                 <span>En preparación</span>
@@ -67,7 +66,7 @@
             </div>
         </div>
 
-        <div class="rp-card rp-listos">
+        <div class="rp-card">
             <div class="rp-card-icono">✓</div>
             <div>
                 <span>Listos</span>
@@ -76,7 +75,7 @@
             </div>
         </div>
 
-        <div class="rp-card rp-entregados">
+        <div class="rp-card">
             <div class="rp-card-icono">★</div>
             <div>
                 <span>Entregados</span>
@@ -87,7 +86,6 @@
 
     </div>
 
-    {{-- FILTROS --}}
     <div class="rp-filtros">
         <div class="rp-filtros-titulo">
             <h3>Buscar pedidos</h3>
@@ -115,20 +113,15 @@
                 @endforeach
             </select>
 
-            <button type="submit" class="rp-btn-buscar">
-                Buscar
-            </button>
+            <button type="submit" class="rp-btn-buscar">Buscar</button>
 
             @if(request('q') || request('estado'))
-                <a href="{{ $rutaPedidos }}" class="rp-btn-limpiar">
-                    Limpiar
-                </a>
+                <a href="{{ $rutaPedidos }}" class="rp-btn-limpiar">Limpiar</a>
             @endif
 
         </form>
     </div>
 
-    {{-- TABLA --}}
     <div class="rp-tabla-contenedor">
 
         <div class="rp-tabla-encabezado">
@@ -158,15 +151,11 @@
                     @forelse($pedidos as $pedido)
                         <tr>
                             <td>
-                                <strong class="rp-codigo">
-                                    #{{ $pedido->codigo }}
-                                </strong>
+                                <strong class="rp-codigo">#{{ $pedido->codigo }}</strong>
                             </td>
 
                             <td>
-                                <span class="rp-cliente">
-                                    {{ $pedido->nombreCliente() }}
-                                </span>
+                                <span class="rp-cliente">{{ $pedido->nombreCliente() }}</span>
                             </td>
 
                             <td>
@@ -186,9 +175,7 @@
                                 </strong>
                             </td>
 
-                            <td>
-                                {{ ucfirst($pedido->forma_pago ?? '—') }}
-                            </td>
+                            <td>{{ ucfirst($pedido->forma_pago ?? '—') }}</td>
 
                             <td>
                                 <span class="rp-estado rp-estado-{{ $pedido->estado }}">
@@ -207,14 +194,8 @@
                                     <select
                                         class="rp-select-estado"
                                         aria-label="Cambiar estado de {{ $pedido->codigo }}"
-                                        onchange="
-                                            if(confirm('¿Deseas cambiar el estado de este pedido?')) {
-                                                document.getElementById('form-estado-{{ $pedido->id }}').querySelector('[name=estado]').value = this.value;
-                                                document.getElementById('form-estado-{{ $pedido->id }}').submit();
-                                            } else {
-                                                this.value = '{{ $pedido->estado }}';
-                                            }
-                                        "
+                                        data-estado-original="{{ $pedido->estado }}"
+                                        onchange="confirmarCambioEstado(this, 'form-estado-{{ $pedido->id }}')"
                                     >
                                         @foreach($estadosLabels as $valor => $texto)
                                             <option value="{{ $valor }}" @selected($pedido->estado === $valor)>
@@ -262,7 +243,6 @@
         </div>
     </div>
 
-    {{-- PAGINACIÓN --}}
     <div class="rp-paginacion">
         {{ $pedidos->links() }}
     </div>
@@ -354,8 +334,7 @@
                         <div>
                             <strong>
                                 @if($h->estado_anterior && $h->estado_anterior !== $h->estado_nuevo)
-                                    {{ $estadosLabels[$h->estado_anterior] ?? $h->estado_anterior }}
-                                    →
+                                    {{ $estadosLabels[$h->estado_anterior] ?? $h->estado_anterior }} →
                                 @endif
 
                                 {{ $estadosLabels[$h->estado_nuevo] ?? $h->estado_nuevo }}
@@ -752,7 +731,7 @@
     margin: 20px 0;
 }
 
-/* MODAL */
+/* MODAL DE DETALLE */
 
 .rp-overlay[hidden] {
     display: none !important;
@@ -972,6 +951,47 @@
 </style>
 
 <script>
+async function confirmarCambioEstado(select, formId) {
+    const estadoOriginal = select.dataset.estadoOriginal;
+    const nuevoEstado = select.value;
+
+    if (nuevoEstado === estadoOriginal) return;
+
+    if (typeof window.pirryConfirm !== 'function') {
+        select.value = estadoOriginal;
+
+        if (typeof window.showToast === 'function') {
+            window.showToast(
+                'No se pudo cargar el sistema de confirmación.',
+                'error'
+            );
+        }
+
+        return;
+    }
+
+    const confirmado = await window.pirryConfirm({
+        icon: '📦',
+        title: '¿Cambiar estado del pedido?',
+        text: '¿Estás seguro de que deseas actualizar el estado de este pedido?',
+        okText: 'Sí, cambiar estado',
+        cancelText: 'Cancelar'
+    });
+
+    if (confirmado) {
+        const formulario = document.getElementById(formId);
+
+        if (formulario) {
+            formulario.querySelector('[name="estado"]').value = nuevoEstado;
+            formulario.submit();
+        } else {
+            select.value = estadoOriginal;
+        }
+    } else {
+        select.value = estadoOriginal;
+    }
+}
+
 function abrirDetalle(id) {
     const modal = document.getElementById('pd-detalle-' + id);
 
