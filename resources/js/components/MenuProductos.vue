@@ -1,3 +1,4 @@
+```vue
 <template>
     <div>
         <div class="menu-busqueda">
@@ -48,8 +49,7 @@
             <button class="btn-edit" @click="abrirCrear()">➕ Nuevo Producto</button>
         </div>
 
-                <!-- Modal de producto (solo administrador). Mismo HTML que tenía
-             store/index.blade.php; la lógica viene de index.js. -->
+        <!-- Modal de producto -->
         <div id="modalProducto" class="modal" :style="{ display: modalAbierto ? 'flex' : 'none' }" @click.self="cerrarModal()">
             <div class="modal-content">
                 <h3>{{ modalTitulo }}</h3>
@@ -93,12 +93,6 @@
 </template>
 
 <script>
-/**
- * Menú de productos + CRUD de administrador.
- * Portado 1:1 desde public/js/menu.js + public/js/index.js (modales).
- * - Mismas clases CSS (menu.css/index.css) y mismos endpoints de Laravel.
- * - Los precios y permisos los valida Laravel; Vue solo muestra la interfaz.
- */
 export default {
     name: 'MenuProductos',
     props: {
@@ -216,7 +210,9 @@ export default {
             try {
                 const res = await fetch(this.routes.productos + '/categorias', { headers: { Accept: 'application/json' } });
                 this.categoriasDB = await res.json();
-            } catch (err) { /* el modal usa las categorías derivadas de productos */ }
+            } catch (err) {
+                // El modal usa las categorías derivadas de productos.
+            }
         },
         async agregarAlCarrito(p) {
             try {
@@ -323,7 +319,9 @@ export default {
                 this.toast('Complete los campos obligatorios.');
                 return;
             }
+
             this.guardando = true;
+
             try {
                 const formData = new FormData();
                 formData.append('nombre', this.form.nombre);
@@ -331,21 +329,42 @@ export default {
                 formData.append('precio', String(precio));
                 formData.append('id_categoria', this.form.id_categoria);
                 formData.append('disponible', this.form.disponible ? '1' : '0');
-                // Si no se eligió archivo, "imagen" no viaja: la imagen se conserva
-                if (this.archivoImagen) formData.append('imagen', this.archivoImagen);
-                const url = this.form.id ? this.routes.productos + '/' + this.form.id : this.routes.productos;
+
+                // Si no se eligió archivo, la imagen actual se conserva.
+                if (this.archivoImagen) {
+                    formData.append('imagen', this.archivoImagen);
+                }
+
+                const url = this.form.id
+                    ? this.routes.productos + '/' + this.form.id
+                    : this.routes.productos;
+
+                // Laravel recibe POST y lo interpreta como PUT al editar.
+                // Esto permite que PHP procese correctamente FormData e imágenes.
+                if (this.form.id) {
+                    formData.append('_method', 'PUT');
+                }
+
                 const res = await fetch(url, {
-                    method: this.form.id ? 'PUT' : 'POST',
-                    headers: { 'X-CSRF-TOKEN': this.csrf, Accept: 'application/json' },
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': this.csrf,
+                        Accept: 'application/json',
+                    },
                     body: formData,
                 });
+
                 const data = await res.json();
+
                 if (res.status === 422) {
                     const errores = data.errors || {};
-                    const primer = (Object.values(errores)[0] && Object.values(errores)[0][0]) || data.message || 'Datos inválidos.';
+                    const primer = (Object.values(errores)[0] && Object.values(errores)[0][0])
+                        || data.message
+                        || 'Datos inválidos.';
                     this.toast(primer);
                     return;
                 }
+
                 if (data.exito) {
                     this.cerrarModal();
                     await this.cargar();
@@ -389,3 +408,4 @@ export default {
     },
 };
 </script>
+```
