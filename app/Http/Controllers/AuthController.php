@@ -29,19 +29,25 @@ class AuthController extends Controller
 
         $usuario = Usuario::where('correo', $request->correo)->first();
 
-        if (! $usuario) {
-            return back()->withErrors(['correo' => 'Usuario no encontrado.'])->withInput();
+        if (!$usuario) {
+            return back()->withErrors([
+                'correo' => 'Usuario no encontrado.'
+            ])->withInput();
         }
 
-        if (! $usuario->isActive()) {
-            return back()->withErrors(['correo' => 'Tu cuenta está inactiva.'])->withInput();
+        if (!$usuario->isActive()) {
+            return back()->withErrors([
+                'correo' => 'Tu cuenta está inactiva.'
+            ])->withInput();
         }
 
         $validPassword = $request->contrasena === $usuario->contrasena
             || Hash::check($request->contrasena, $usuario->contrasena);
 
-        if (! $validPassword) {
-            return back()->withErrors(['contrasena' => 'Contraseña incorrecta.'])->withInput();
+        if (!$validPassword) {
+            return back()->withErrors([
+                'contrasena' => 'Contraseña incorrecta.'
+            ])->withInput();
         }
 
         Auth::login($usuario);
@@ -50,7 +56,8 @@ class AuthController extends Controller
             return redirect()->route('admin.dashboard');
         }
 
-        return redirect()->route('home')->with('success', '¡Bienvenido, '.$usuario->nombre.'!');
+        return redirect()->route('home')
+            ->with('success', '¡Bienvenido, '.$usuario->nombre.'!');
     }
 
     public function showRegister()
@@ -69,7 +76,11 @@ class AuthController extends Controller
             'documento' => 'required|string|max:50',
             'correo' => 'required|email|unique:usuarios,correo',
             'usuario' => 'required|string|max:50|unique:usuarios,usuario',
-            'contrasena' => ['required', 'confirmed', Password::min(6)],
+            'contrasena' => [
+                'required',
+                'confirmed',
+                Password::min(6)
+            ],
         ], [
             'correo.unique' => 'Este correo ya está registrado.',
             'usuario.unique' => 'Este nombre de usuario ya existe.',
@@ -88,12 +99,15 @@ class AuthController extends Controller
                 'id_rol' => $rolId,
                 'estado' => 'activo',
             ]);
+
         } catch (\Throwable $e) {
             report($e);
 
             return back()
                 ->withInput()
-                ->withErrors(['correo' => 'No pudimos crear tu cuenta en este momento. Por favor intenta de nuevo.']);
+                ->withErrors([
+                    'correo' => 'No pudimos crear tu cuenta en este momento. Por favor intenta de nuevo.'
+                ]);
         }
 
         Auth::login($usuario);
@@ -103,30 +117,28 @@ class AuthController extends Controller
     }
 
     /**
-     * Devuelve el id de un rol válido para el nuevo cliente.
-     * Orden de búsqueda: rol "Cliente" -> cualquier rol existente.
-     * Si la tabla de roles está vacía, crea el rol "Cliente" para que
-     * el registro nunca falle por la llave foránea id_rol.
+     * Obtiene exclusivamente el rol Cliente activo.
+     * Nunca asigna Administrador ni otro rol como alternativa.
      */
     private function resolverRolCliente(): int
     {
-        $rol = Role::where('nombre', 'Cliente')->first()
-            ?? Role::orderBy('id_roles')->first();
+        $rol = Role::where('nombre', 'Cliente')
+            ->whereRaw("LOWER(estado) = 'activo'")
+            ->first();
 
-        if ($rol) {
-            return (int) $rol->id_roles;
+        if (!$rol) {
+            throw new \RuntimeException(
+                'El rol Cliente no existe o está inactivo.'
+            );
         }
 
-        return (int) Role::create([
-            'nombre' => 'Cliente',
-            'descripcion' => 'cliente de la tienda',
-            'estado' => 'Activo',
-        ])->id_roles;
+        return (int) $rol->id_roles;
     }
 
     public function logout(Request $request)
     {
         Auth::logout();
+
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 

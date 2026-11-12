@@ -6,7 +6,7 @@
 @section('content')
 <div class="header">
     <div></div>
-    <a href="{{ route('admin.usuarios.index') }}" class="btn-volver">← Volver</a>
+    <a href="{{ route('admin.usuarios.index') }}" class="btn-volver">&larr; Volver</a>
 </div>
 
 <div class="contenedor-form">
@@ -19,35 +19,53 @@
 
         <form action="{{ route('admin.usuarios.store') }}" method="POST" class="formulario">
             @csrf
+
             <div class="grid">
                 <div class="campo">
                     <label>Nombres</label>
                     <input type="text" name="nombre" value="{{ old('nombre') }}" required>
                 </div>
+
                 <div class="campo">
                     <label>Documento</label>
                     <input type="text" name="documento" value="{{ old('documento') }}" required>
                 </div>
+
                 <div class="campo">
                     <label>Correo</label>
                     <input type="email" name="correo" value="{{ old('correo') }}" required>
                 </div>
+
                 <div class="campo">
                     <label>Usuario</label>
                     <input type="text" name="usuario" value="{{ old('usuario') }}" required>
                 </div>
+
                 <div class="campo">
                     <label>Contraseña</label>
                     <input type="password" name="contrasena" required>
                 </div>
+
                 <div class="campo">
                     <label>Rol</label>
                     <select name="id_rol" required>
                         @foreach($roles as $rol)
-                            <option value="{{ $rol->id_roles }}">{{ $rol->nombre }}</option>
+                            @php
+                                $nombreRol = match ((int) $rol->id_roles) {
+                                    1 => 'Admin',
+                                    2 => 'Empleado',
+                                    3 => 'Cliente',
+                                    default => $rol->nombre,
+                                };
+                            @endphp
+
+                            <option value="{{ $rol->id_roles }}" {{ old('id_rol') == $rol->id_roles ? 'selected' : '' }}>
+                                {{ $nombreRol }}
+                            </option>
                         @endforeach
                     </select>
                 </div>
+
                 <div class="campo">
                     <label>Estado</label>
                     <select name="estado" required>
@@ -56,6 +74,7 @@
                     </select>
                 </div>
             </div>
+
             <div class="acciones">
                 <button type="submit" class="btn guardar">Registrar</button>
                 <a href="{{ route('admin.usuarios.index') }}" class="btn cancelar">Cancelar</a>
