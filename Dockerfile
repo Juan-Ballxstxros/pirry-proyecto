@@ -25,10 +25,11 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && docker-php-ext-configure gd --with-freetype --with-jpeg \
     && docker-php-ext-install -j"$(nproc)" \
     pdo_mysql mbstring exif pcntl bcmath gd zip intl opcache \
-     && (a2dismod mpm_event mpm_worker mpm_prefork || true) \
-    && rm -f /etc/apache2/mods-enabled/mpm_*.load \
-              /etc/apache2/mods-enabled/mpm_*.conf \
+     && find /etc/apache2/mods-enabled -maxdepth 1 -name 'mpm_*.load' -delete \
+    && find /etc/apache2/mods-enabled -maxdepth 1 -name 'mpm_*.conf' -delete \
     && a2enmod mpm_prefork rewrite headers \
+    && apache2ctl -M | grep mpm_prefork_module \
+    && ! apache2ctl -M | grep -E 'mpm_event_module|mpm_worker_module' \
     && rm -rf /var/lib/apt/lists/*
 
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
