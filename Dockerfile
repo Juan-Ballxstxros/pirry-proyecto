@@ -42,8 +42,14 @@ COPY --from=frontend /app/public/build ./public/build
 
 COPY docker/apache-vhost.conf /etc/apache2/sites-available/000-default.conf
 
+
 RUN composer install --no-dev --no-interaction --prefer-dist --optimize-autoloader \
     && mkdir -p storage/app/public \
+    storage/framework/cache/data \
+    storage/framework/sessions \
+    storage/framework/views \
+    storage/logs \
+    bootstrap/cache \
     && php artisan storage:link \
     && chown -R www-data:www-data storage bootstrap/cache \
     && chmod -R ug+rwx storage bootstrap/cache
