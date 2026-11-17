@@ -119,7 +119,9 @@ class GmailMailer
         $client->setClientSecret($clientSecret);
         $client->addScope(self::GMAIL_SEND_SCOPE);
 
-        $token = $client->fetchAccessTokenWithRefreshToken($refreshToken);
+        $refreshToken = trim($refreshToken);
+$refreshToken = preg_replace('/^\xEF\xBB\xBF/', '', $refreshToken);
+$token = $client->fetchAccessTokenWithRefreshToken($refreshToken);
 
         if (isset($token['error'])) {
             throw new RuntimeException(
