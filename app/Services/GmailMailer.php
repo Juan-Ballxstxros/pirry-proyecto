@@ -119,8 +119,21 @@ class GmailMailer
         $client->setClientSecret($clientSecret);
         $client->addScope(self::GMAIL_SEND_SCOPE);
 
-        // Intercambia el refresh token por un access token temporal.
-        $client->fetchAccessTokenWithRefreshToken($refreshToken);
+        $token = $client->fetchAccessTokenWithRefreshToken($refreshToken);
+
+        if (isset($token['error'])) {
+            throw new RuntimeException(
+                'Google could not renew OAuth access. Code: '.(string) $token['error']
+            );
+        }
+
+        $accessToken = $client->getAccessToken();
+
+        if (!is_array($accessToken) || empty($accessToken['access_token'])) {
+            throw new RuntimeException(
+                'Google did not return a valid access token. Check OAuth credentials.'
+            );
+        }
 
         return $client;
     }
